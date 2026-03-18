@@ -1,0 +1,33 @@
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akademik", "Akademik\Akademik.csproj", "{FC6FA772-B788-4394-BCE9-524F95C0D798}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akademik.Services", "Akademik.Services\Akademik.Services.csproj", "{BF2208AC-B342-4ED9-9BE7-3B81304F19FB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akademik.DataProvider", "Akademik.DataProvider\Akademik.DataProvider.csproj", "{8FA3CDE2-7531-4899-89FB-69150898C98F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FC6FA772-B788-4394-BCE9-524F95C0D798}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC6FA772-B788-4394-BCE9-524F95C0D798}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC6FA772-B788-4394-BCE9-524F95C0D798}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC6FA772-B788-4394-BCE9-524F95C0D798}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF2208AC-B342-4ED9-9BE7-3B81304F19FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF2208AC-B342-4ED9-9BE7-3B81304F19FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF2208AC-B342-4ED9-9BE7-3B81304F19FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF2208AC-B342-4ED9-9BE7-3B81304F19FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8FA3CDE2-7531-4899-89FB-69150898C98F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8FA3CDE2-7531-4899-89FB-69150898C98F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8FA3CDE2-7531-4899-89FB-69150898C98F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8FA3CDE2-7531-4899-89FB-69150898C98F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
