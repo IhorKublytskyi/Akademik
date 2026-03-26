@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, DateTime, func
-from app.database import Base
+from src.infrastructure.database.connection import Base
 
 class Event(Base):
     __tablename__ = "events"

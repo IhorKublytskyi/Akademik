@@ -10,4 +10,4 @@ RUN poetry config virtualenvs.create false && poetry install --no-interaction --
 COPY . .
 
 EXPOSE 3002
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "3002"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "3002"]
