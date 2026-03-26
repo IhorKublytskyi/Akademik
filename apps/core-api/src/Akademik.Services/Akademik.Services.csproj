@@ -6,4 +6,12 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.17.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Akademik.DataProvider\Akademik.DataProvider.csproj" />
+    </ItemGroup>
+
 </Project>
