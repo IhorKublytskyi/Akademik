@@ -7,6 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="BCrypt.Net-Core" Version="1.6.0" />
+      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.5" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Akademik.DataProvider\Akademik.DataProvider.csproj" />
       <ProjectReference Include="..\Akademik.Services\Akademik.Services.csproj" />
     </ItemGroup>
 

@@ -18,3 +18,7 @@ Thumbs.db
 
 dist/
 build/
+
+__pycache__/
+*.pyc
+*.pyo

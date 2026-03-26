@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, DateTime
-from app.database import Base
+from src.infrastructure.database.connection import Base
 
 class QRCode(Base):
     __tablename__ = "qr_codes"
