@@ -29,11 +29,24 @@ export default function LoginForm() {
 
     const onSubmit = async (data: LoginFormValues) => {
         try {
-            const response = await api.post("/auth/login", data)
+            // const response = await api.post("/api/core/auth/login", data)
 
-            const { user, token } = response.data
+            // const { user, token } = response.data
 
-            setAuth(user, token)
+            // setAuth(user, token)
+
+            const fakeUser = {
+                id: "123",
+                email: "grutoha@gmail.com",
+                role: "admin" as const,
+                name: "Test Admin"
+            }
+            const fakeToken = "super-secret-fake-jwt-token"
+
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+
+            setAuth(fakeUser, fakeToken)
+
             toast.success("Login successful! Welcome to Akademik")
 
             router.push("/dashboard")
@@ -72,7 +85,7 @@ export default function LoginForm() {
 
                 <Button
                     type="submit"
-                    className="w-full"
+                    className="w-full cursor-pointer"
                     disabled={form.formState.isSubmitting}
                 >
                     {form.formState.isSubmitting ? "Checking..." : "Submit"}
