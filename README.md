@@ -107,13 +107,6 @@ The backend is organized into specialized modules to ensure a clean separation o
 | **Akademik** | Executable (API) | Program entry point, Middleware, Controllers/Endpoints |
 | **Akademik.Services** | Class Library | Business logic: JWT Generation, User Registration, Password Hashing |
 | **Akademik.DataProvider** | Class Library | Database context, Entity configurations, Migrations, Models |
-## API Endpoints
-
-| Method | Path | Auth | Description |
-|---|---|---|---|
-| `GET` | `/health` | — | Health check |
-| `GET` | `/v1/me` | Bearer JWT | Current user identity |
----
 
 ## Implemented Domain Models (`core-api`)
 The **User** entity is fully configured using EF Core Fluent API with the following database-level optimizations:
