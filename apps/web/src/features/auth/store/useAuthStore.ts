@@ -1,5 +1,5 @@
-import { create } from 'zustand'
-import Cookies from 'js-cookie'
+import { create } from "zustand"
+import Cookies from "js-cookie"
 
 interface User {
     id: string;
@@ -25,8 +25,8 @@ export const useAuthStore = create<AuthState>((set) => ({
         set({ user, token, isAuthenticated: true })
     },
     logout: () => {
+        window.location.href = "/login"
         Cookies.remove("auth_token")
         set({ user: null, token: null, isAuthenticated: false })
-        window.location.href = "/login"
     },
 }))
