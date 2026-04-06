@@ -25,8 +25,8 @@ export const useAuthStore = create<AuthState>((set) => ({
         set({ user, token, isAuthenticated: true })
     },
     logout: () => {
+        window.location.href = "/login"
         Cookies.remove("auth_token")
         set({ user: null, token: null, isAuthenticated: false })
-        window.location.href = "/login"
     },
 }))

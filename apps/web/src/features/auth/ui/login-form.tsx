@@ -41,6 +41,7 @@ export default function LoginForm() {
                 role: "admin" as const,
                 name: "Test Admin"
             }
+
             const fakeToken = "super-secret-fake-jwt-token"
 
             await new Promise((resolve) => setTimeout(resolve, 1000));
