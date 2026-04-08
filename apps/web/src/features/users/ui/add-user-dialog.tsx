@@ -40,7 +40,7 @@ export default function AddUserDialog() {
         try {
             await api.post("/api/core/auth/register", {
                 ...data,
-                role: "user"
+                role: "Resident"
             })
 
             toast.success("The user has been successfully added!")

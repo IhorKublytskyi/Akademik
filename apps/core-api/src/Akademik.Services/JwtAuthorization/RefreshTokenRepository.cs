@@ -1,6 +1,4 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using Akademik.DataProvider;
+﻿using Akademik.DataProvider;
 using Akademik.DataProvider.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,8 +23,11 @@ public sealed class RefreshTokenRepository : IRefreshTokenRepository
 
 	public async Task<RefreshToken?> GetByBodyAsync(string tokenBody, CancellationToken cancellationToken = default)
 	{
-		return await _context.RefreshTokens
+		var token =await _context.RefreshTokens
 			.AsNoTracking()
+			.Include(rt => rt.User)
 			.FirstOrDefaultAsync(rt => rt.TokenBody == tokenBody, cancellationToken);
+
+		return token;
 	}
 }

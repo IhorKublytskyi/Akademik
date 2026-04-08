@@ -1,4 +1,3 @@
-using System.IdentityModel.Tokens.Jwt;
 using Akademik.Services.JwtAuthorization;
 using System.Text;
 using Akademik.DataProvider.Models;
@@ -34,7 +33,8 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins("http://localhost:3000")
               .AllowAnyHeader()
-              .AllowAnyMethod();
+              .AllowAnyMethod()
+              .AllowCredentials();;
     });
 });
 
@@ -51,6 +51,7 @@ builder.Services
             ValidateIssuer = true,
             ValidateAudience = true,
             ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero,
             ValidateIssuerSigningKey = true,
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
@@ -123,7 +124,7 @@ app.MapPost("/api/core/auth/register", async (
         FirstName = request.FirstName,
         LastName = request.LastName,
         Role = Enum.Parse<UserRole>(request.Role),
-        PhoneNumber = request.Phone,
+        PhoneNumber = request.PhoneNumber,
         Status = UserStatus.Active,
         PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
         CreatedAt = DateTime.UtcNow
@@ -135,17 +136,20 @@ app.MapPost("/api/core/auth/register", async (
 }).RequireAuthorization("AdminOnly");
 
 app.MapPost("/api/core/auth/refresh", async (
-    [FromBody] string refreshToken, 
+    [FromBody] RefreshRequest request, 
     IJwtService jwtService, 
     CancellationToken cancellationToken) =>
 {
     try
     {
-        var token = await jwtService.GetByBodyAsync(refreshToken, cancellationToken);
+        var token = await jwtService.GetByBodyAsync(request.RefreshToken, cancellationToken);
 
         token.Revoked = DateTime.UtcNow;
         
         var newTokens = await jwtService.GenerateTokensAsync(token.User,  cancellationToken);
+
+        Console.WriteLine($"Access Token: {newTokens.AccessToken}");
+        Console.WriteLine($"Refresh Token: {newTokens.RefreshToken}");
 
         return Results.Ok(newTokens);
     }
@@ -154,7 +158,7 @@ app.MapPost("/api/core/auth/refresh", async (
         return Results.Problem(ex.Message);        
     }
 
-}).RequireAuthorization();
+});
 
 app.MapPost("api/core/assignments-get", async (
     [FromBody] ResidentsListRequest request,
@@ -234,7 +238,7 @@ app.MapGet("/api/core/me", async (
         return Results.BadRequest("Invalid token");
     }
 
-});
+}).RequireAuthorization();
 
 app.MapGet("/api/core/users-get/{id:int}", async (
     [FromQuery] int id,

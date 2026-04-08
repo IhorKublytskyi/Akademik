@@ -1,6 +1,4 @@
-﻿using Akademik.DataProvider.Models;
-
-namespace Akademik.Models;
+﻿namespace Akademik.Models;
 
 public record RegisterRequest(
 	string Email, 
@@ -8,4 +6,4 @@ public record RegisterRequest(
 	string FirstName, 
 	string LastName, 
 	string Role, 
-	string? Phone);
+	string? PhoneNumber);

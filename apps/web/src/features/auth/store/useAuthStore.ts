@@ -8,8 +8,8 @@ interface User {
     lastName: string;
     email: string;
     phoneNumber: string;
-    role: "admin" | "user";
-    status: "active" | "blocked";
+    role: "Admin" | "Resident";
+    status: "Active" | "Blocked";
     createdAt: number;
 }
 
@@ -19,7 +19,7 @@ interface AuthState {
     refreshToken: string | null;
     isAuthenticated: boolean;
     fetchProfile: () => void;
-    setAuth: (user: User, token: string, refreshToken: string) => void;
+    setAuth: (user: User | null, token: string, refreshToken: string) => void;
     logout: () => void;
 }
 
@@ -31,7 +31,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
     fetchProfile: async () => {
         try {
-            const response = await api.get("/api/core/users/me")
+            const response = await api.get("/api/core/me")
 
             set({
                 user: response.data,

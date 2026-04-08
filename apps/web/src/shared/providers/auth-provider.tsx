@@ -14,6 +14,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const token = Cookies.get("auth_token")
 
             if (token && !user) {
+                console.log("Token found, fetching profile...")
                 await fetchProfile()
             }
 

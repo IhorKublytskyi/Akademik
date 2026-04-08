@@ -20,7 +20,7 @@ export function AppSidebar() {
 
     const { state } = useSidebar()
 
-    const userRole = user?.role || "user"
+    const userRole = user?.role || "Resident"
     const filteredNav = NAV_ITEMS.filter(item => item.roles.includes(userRole))
 
     return (

@@ -29,27 +29,29 @@ export default function LoginForm() {
 
     const onSubmit = async (data: LoginFormValues) => {
         try {
-            // const response = await api.post("/api/core/auth/login", data)
-            // const { user, token } = response.data
-            // setAuth(user, token.accessToken, token.refreshToken)
+            const response = await api.post("/api/core/auth/login", data)
+            const { user, token } = response.data
+            setAuth(user, token.accessToken, token.refreshToken)
 
-            const fakeUser = {
-                id: "1",
-                firstName: "Anton",
-                lastName: "Hry",
-                email: "grutoha@gmail.com",
-                phoneNumber: "795029892",
-                role: "admin" as "admin",
-                status: "active" as "active",
-                createdAt: 12312312
-            }
+            console.log(user);
 
-            const fakeToken = {
-                accessToken: "super_secret_access_token",
-                refreshToken: "super_secret_refresh_token"
-            }
+            // const fakeUser = {
+            //     id: "1",
+            //     firstName: "Anton",
+            //     lastName: "Hry",
+            //     email: "grutoha@gmail.com",
+            //     phoneNumber: "795029892",
+            //     role: "admin" as "admin",
+            //     status: "active" as "active",
+            //     createdAt: 12312312
+            // }
 
-            setAuth(fakeUser, fakeToken.accessToken, fakeToken.refreshToken)
+            // const fakeToken = {
+            //     accessToken: "super_secret_access_token",
+            //     refreshToken: "super_secret_refresh_token"
+            // }
+
+            // setAuth(fakeUser, fakeToken.accessToken, fakeToken.refreshToken)
 
             toast.success("Login successful! Welcome to Akademik")
             router.push("/dashboard")
