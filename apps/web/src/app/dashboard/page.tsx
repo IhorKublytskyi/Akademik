@@ -27,7 +27,7 @@ export default function DashboardPage() {
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold mt-2">
-                            {username || "User"}
+                            {user?.firstName + " " + user?.lastName || "User"}
                         </div>
                         <p className="text-xs text-muted-foreground mt-1">
                             Email: {user?.email}

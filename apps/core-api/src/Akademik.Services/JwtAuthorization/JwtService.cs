@@ -48,7 +48,7 @@ public sealed class JwtService : IJwtService
 			issuer: _configuration["Jwt:Issuer"],
 			audience: _configuration["Jwt:Audience"],
 			claims: claims,
-			expires: DateTime.UtcNow.AddHours(8),
+			expires: DateTime.UtcNow.AddHours(2),
 			signingCredentials: credentials);
 
 		return new JwtSecurityTokenHandler().WriteToken(token);
