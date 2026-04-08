@@ -14,20 +14,4 @@
       <ProjectReference Include="..\Akademik.DataProvider\Akademik.DataProvider.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Compile Include="obj\Debug\net10.0\.NETCoreApp,Version=v10.0.AssemblyAttributes.cs" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Content Include="obj\Akademik.Services.csproj.nuget.dgspec.json" />
-      <Content Include="obj\Akademik.Services.csproj.nuget.g.props" />
-      <Content Include="obj\Akademik.Services.csproj.nuget.g.targets" />
-      <Content Include="obj\Debug\net10.0\Akademik.Services.AssemblyInfoInputs.cache" />
-      <Content Include="obj\Debug\net10.0\Akademik.Services.assets.cache" />
-      <Content Include="obj\project.assets.json" />
-      <Content Include="obj\project.nuget.cache" />
-      <Content Include="obj\project.packagespec.json" />
-      <Content Include="obj\rider.project.restore.info" />
-    </ItemGroup>
-
 </Project>

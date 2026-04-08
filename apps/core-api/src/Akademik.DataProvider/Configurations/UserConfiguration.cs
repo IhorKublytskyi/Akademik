@@ -1,4 +1,5 @@
 ﻿using Akademik.DataProvider.Models;
+using Akademik.DataProvider.Models.Converters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -11,7 +12,6 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<User>
         builder.ToTable("users");
 
         builder.HasKey(u => u.Id);
-
 
         builder
             .Property(u => u.FirstName)
@@ -54,7 +54,7 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<User>
             .HasConversion<UserRoleStringConverter>()
             .HasMaxLength(20)
             .IsRequired();
-
+        
         builder
             .HasIndex(u => u.Email)
             .HasDatabaseName("Index_Email_Unique")

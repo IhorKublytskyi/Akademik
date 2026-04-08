@@ -29,24 +29,20 @@ export default function LoginForm() {
 
     const onSubmit = async (data: LoginFormValues) => {
         try {
-            // const response = await api.post("/api/core/auth/login", data)
+            const response = await api.post(
+                "http://localhost:5202/api/core/auth/login", 
+                data,
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json"
+                    }
+                })
 
-            // const { user, token } = response.data
+            const { user, token } = response.data
 
-            // setAuth(user, token)
-
-            const fakeUser = {
-                id: "123",
-                email: "grutoha@gmail.com",
-                role: "admin" as const,
-                name: "Test Admin"
-            }
-
-            const fakeToken = "super-secret-fake-jwt-token"
-
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-
-            setAuth(fakeUser, fakeToken)
+            setAuth(user, token.accessToken)
+            console.log(user, token)
 
             toast.success("Login successful! Welcome to Akademik")
 

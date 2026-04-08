@@ -53,7 +53,16 @@ public sealed class JwtService : IJwtService
 
 		return new JwtSecurityTokenHandler().WriteToken(token);
 	}
-	
+
+	public Claim? ExtractClaim(string token, string claimName)
+	{
+		var jwt = new JwtSecurityTokenHandler().ReadJwtToken(token);
+		
+		var claim = jwt.Claims.First(c => c.Type == claimName);
+
+		return claim;
+	}
+
 	public async ValueTask<TokenModel> GenerateTokensAsync(User? user, CancellationToken cancellationToken = default)
 	{
 		cancellationToken.ThrowIfCancellationRequested();

@@ -8,7 +8,8 @@ import { LogOut, User as UserIcon } from "lucide-react"
 export default function DashboardPage() {
     const user = useAuthStore((state) => state.user)
     const logout = useAuthStore((state) => state.logout)
-
+    const username = user?.firstName + " " +user?.lastName;
+    console.log(user)
     return (
         <div className="flex flex-col gap-6">
             <div>
@@ -26,7 +27,7 @@ export default function DashboardPage() {
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold mt-2">
-                            {user?.name || "User"}
+                            {username || "User"}
                         </div>
                         <p className="text-xs text-muted-foreground mt-1">
                             Email: {user?.email}

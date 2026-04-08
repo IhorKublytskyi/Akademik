@@ -7,5 +7,5 @@ public record RegisterRequest(
 	string Password, 
 	string FirstName, 
 	string LastName, 
-	UserRole Role, 
+	string Role, 
 	string? Phone);
