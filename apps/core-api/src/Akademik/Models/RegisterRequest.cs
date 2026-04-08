@@ -1,0 +1,11 @@
+﻿using Akademik.DataProvider.Models;
+
+namespace Akademik.Models;
+
+public record RegisterRequest(
+	string Email, 
+	string Password, 
+	string FirstName, 
+	string LastName, 
+	string Role, 
+	string? Phone);

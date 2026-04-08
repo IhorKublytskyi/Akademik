@@ -13,8 +13,30 @@ postgres_data/
 .DS_Store
 Thumbs.db
 
+
+# DOTNET SECTION
 .vscode/
 .idea/
+[Bb]in/
+[Oo]bj/
+*.user
+*.userosscache
+*.sln.doccache
+.vs/
+.idea/
+.user/
+*.suo
+*.user
+*.userosscache
+*.sln.doccache
+Properties/
+*.sln.iml
+*.Designer.cs
+# DOTNET SECTION END
 
 dist/
 build/
+
+__pycache__/
+*.pyc
+*.pyo
