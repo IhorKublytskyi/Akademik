@@ -36,7 +36,7 @@ api.interceptors.response.use(
                 const currentUser = useAuthStore.getState().user
 
                 if (currentUser) {
-                    useAuthStore.getState().setAuth(currentUser, newToken)
+                    useAuthStore.getState().setAuth(currentUser, newToken.accessToken, newToken.refreshToken)
                 }
 
                 originalRequest.headers.Authorization = `Bearer ${newToken}`

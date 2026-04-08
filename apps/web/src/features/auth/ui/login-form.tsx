@@ -29,23 +29,29 @@ export default function LoginForm() {
 
     const onSubmit = async (data: LoginFormValues) => {
         try {
-            const response = await api.post(
-                "http://localhost:5202/api/core/auth/login", 
-                data,
-                {
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Accept": "application/json"
-                    }
-                })
+            // const response = await api.post("/api/core/auth/login", data)
+            // const { user, token } = response.data
+            // setAuth(user, token.accessToken, token.refreshToken)
 
-            const { user, token } = response.data
+            const fakeUser = {
+                id: "1",
+                firstName: "Anton",
+                lastName: "Hry",
+                email: "grutoha@gmail.com",
+                phoneNumber: "795029892",
+                role: "admin" as "admin",
+                status: "active" as "active",
+                createdAt: 12312312
+            }
 
-            setAuth(user, token.accessToken)
-            console.log(user, token)
+            const fakeToken = {
+                accessToken: "super_secret_access_token",
+                refreshToken: "super_secret_refresh_token"
+            }
+
+            setAuth(fakeUser, fakeToken.accessToken, fakeToken.refreshToken)
 
             toast.success("Login successful! Welcome to Akademik")
-
             router.push("/dashboard")
         } catch (error: any) {
             const message = error.response?.data?.messsage || "Incorrect email or password"

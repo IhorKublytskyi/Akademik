@@ -14,7 +14,9 @@ import * as z from "zod"
 
 const registerSchema = z.object({
     email: z.string().email("Invalid email"),
-    name: z.string().min(2, "Enter first and last name"),
+    firstName: z.string().min(2, "Enter first name"),
+    lastName: z.string().min(2, "Enter last name"),
+    phoneNumber: z.string().min(9, "Enter valid phone number"),
     password: z.string().min(6, "Password must be at least 6 characters")
 })
 
@@ -25,7 +27,13 @@ export default function AddUserDialog() {
 
     const form = useForm<RegisterFormValues>({
         resolver: zodResolver(registerSchema),
-        defaultValues: { email: "", name: "", password: "" },
+        defaultValues: {
+            email: "",
+            firstName: "",
+            lastName: "",
+            phoneNumber: "",
+            password: ""
+        },
     })
 
     const onSubmit = async (data: RegisterFormValues) => {
@@ -44,7 +52,7 @@ export default function AddUserDialog() {
     }
 
     return (
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button className="cursor-pointer">
                     <Plus className="mr-2 h-4 w-4" />
@@ -59,12 +67,23 @@ export default function AddUserDialog() {
                 <form onSubmit={form.handleSubmit(onSubmit)} className="mt-4">
                     <FieldGroup>
                         <Controller
-                            name="name"
+                            name="firstName"
                             control={form.control}
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
-                                    <FieldLabel>Full name</FieldLabel>
-                                    <Input {...field} placeholder="John Smith" />
+                                    <FieldLabel>First name</FieldLabel>
+                                    <Input {...field} placeholder="John" />
+                                    <FieldError errors={[fieldState.error]} />
+                                </Field>
+                            )}
+                        />
+                        <Controller
+                            name="lastName"
+                            control={form.control}
+                            render={({ field, fieldState }) => (
+                                <Field data-invalid={fieldState.invalid}>
+                                    <FieldLabel>Last name</FieldLabel>
+                                    <Input {...field} placeholder="Smith" />
                                     <FieldError errors={[fieldState.error]} />
                                 </Field>
                             )}
@@ -76,6 +95,17 @@ export default function AddUserDialog() {
                                 <Field data-invalid={fieldState.invalid}>
                                     <FieldLabel>Email</FieldLabel>
                                     <Input {...field} placeholder="student@example.com" />
+                                    <FieldError errors={[fieldState.error]} />
+                                </Field>
+                            )}
+                        />
+                        <Controller
+                            name="phoneNumber"
+                            control={form.control}
+                            render={({ field, fieldState }) => (
+                                <Field data-invalid={fieldState.invalid}>
+                                    <FieldLabel>Phone number</FieldLabel>
+                                    <Input {...field} placeholder="795902782" />
                                     <FieldError errors={[fieldState.error]} />
                                 </Field>
                             )}
