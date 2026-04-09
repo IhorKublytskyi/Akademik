@@ -34,7 +34,7 @@ builder.Services.AddCors(options =>
         policy.WithOrigins("http://localhost:3000")
               .AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowCredentials();;
+              .AllowCredentials(); ;
     });
 });
 
@@ -45,7 +45,7 @@ builder.Services
         options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     })
     .AddJwtBearer(options =>
-    {   
+    {
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -59,14 +59,15 @@ builder.Services
         };
     });
 
-builder.Services.AddAuthorization(options => {
+builder.Services.AddAuthorization(options =>
+{
     options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
     options.AddPolicy("ResidentOnly", policy => policy.RequireRole("Resident"));
 });
 
 var app = builder.Build();
 
-app.UseCors("AllowFrontend"); 
+app.UseCors("AllowFrontend");
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
@@ -89,7 +90,7 @@ app.MapPost("/api/core/auth/login", async (
     {
         return Results.Forbid();
     }
-    
+
     var tokens = await jwtService.GenerateTokensAsync(user, cancellationToken);
 
     var response = new
@@ -131,11 +132,11 @@ app.MapPost("/api/core/auth/register", async (
     await userService.CreateAsync(newUser, cancellationToken);
 
     return Results.Ok(UserModel.FromUser(newUser));
-}).RequireAuthorization("AdminOnly");
+});
 
 app.MapPost("/api/core/auth/refresh", async (
-    [FromBody] RefreshRequest request, 
-    IJwtService jwtService, 
+    [FromBody] RefreshRequest request,
+    IJwtService jwtService,
     CancellationToken cancellationToken) =>
 {
     try
@@ -143,17 +144,17 @@ app.MapPost("/api/core/auth/refresh", async (
         var token = await jwtService.GetByBodyAsync(request.RefreshToken, cancellationToken);
 
         token.Revoked = DateTime.UtcNow;
-        
-        var newTokens = await jwtService.GenerateTokensAsync(token.User,  cancellationToken);
+
+        var newTokens = await jwtService.GenerateTokensAsync(token.User, cancellationToken);
 
         Console.WriteLine($"Access Token: {newTokens.AccessToken}");
         Console.WriteLine($"Refresh Token: {newTokens.RefreshToken}");
 
         return Results.Ok(newTokens);
     }
-    catch(Exception ex)
+    catch (Exception ex)
     {
-        return Results.Problem(ex.Message);        
+        return Results.Problem(ex.Message);
     }
 
 });
@@ -174,7 +175,7 @@ app.MapPost("/api/core/assignments-get", async (
     CancellationToken cancellationToken) =>
 {
     var result = await service.GetAllAsync(request.Pagination, cancellationToken);
-    
+
     return Results.Ok(result);
 }).RequireAuthorization("AdminOnly");
 
@@ -190,9 +191,9 @@ app.MapPost("/api/core/assignments-add", async (
         StartDate = DateOnly.FromDateTime(request.StartDate),
         IsActive = true
     };
-    
+
     await service.CreateAsync(assignment, cancellationToken);
-    
+
     return Results.Ok(assignment);
 }).RequireAuthorization("AdminOnly");
 
@@ -201,13 +202,17 @@ app.MapPost("/api/core/users-get", async (
     IUserService service,
     CancellationToken cancellationToken) =>
 {
-    var users =  await service.GetAllAsync(request.Pagination, cancellationToken);
-    
-    return Results.Ok(users);
+    var users = await service.GetAllAsync(request.Pagination, cancellationToken);
+    var result = users.Items.Select(U => UserModel.FromUser(U));
+    return Results.Ok(new PagedResult<UserModel>()
+    {
+        Items = result,
+        Count = users.Count
+    });
 });
 
 app.MapPost("/api/core/users-edit", async (
-    [FromBody]UpdateUserRequest request,
+    [FromBody] UpdateUserRequest request,
     IUserService service,
     CancellationToken cancellationToken) =>
 {
@@ -220,7 +225,7 @@ app.MapPost("/api/core/users-edit", async (
         Email = request.Email,
         Status = Enum.Parse<UserStatus>(request.Status)
     };
-    
+
     return await service.UpdateAsync(user, cancellationToken);
 });
 
@@ -234,7 +239,7 @@ app.MapGet("/api/core/me", async (
     {
         string? authString = context.Request.Headers["Authorization"];
         string? token = authString?.Split(' ').Last();
-        
+
         var id = jwtService.ExtractClaim(token, "sub").Value;
 
         var user = await service.GetByIdAsync(int.Parse(id), cancellationToken);
