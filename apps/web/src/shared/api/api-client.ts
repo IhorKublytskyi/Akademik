@@ -1,7 +1,6 @@
 import { useAuthStore } from "@/features/auth/store/useAuthStore"
 import axios from "axios"
 import Cookies from "js-cookie"
-import { Chokokutai } from "next/font/google"
 
 export const api = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5202",

@@ -1,17 +1,7 @@
 import { create } from "zustand"
 import Cookies from "js-cookie"
-import { api } from "@/shared/api/api-client";
-
-interface User {
-    id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    phoneNumber: string;
-    role: "Admin" | "Resident";
-    status: "Active" | "Blocked";
-    createdAt: number;
-}
+import { api } from "@/shared/api/api-client"
+import { User } from "@/shared/types/user";
 
 interface AuthState {
     user: User | null;

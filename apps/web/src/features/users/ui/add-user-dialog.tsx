@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/shared/ui/field"
 import { Input } from "@/shared/ui/input"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useQueryClient } from "@tanstack/react-query"
 import { Plus } from "lucide-react"
 import { useState } from "react"
 import { Controller, useForm } from "react-hook-form"
@@ -25,6 +26,8 @@ type RegisterFormValues = z.infer<typeof registerSchema>
 export default function AddUserDialog() {
     const [open, setOpen] = useState(false)
 
+    const queryClient = useQueryClient()
+
     const form = useForm<RegisterFormValues>({
         resolver: zodResolver(registerSchema),
         defaultValues: {
@@ -43,11 +46,12 @@ export default function AddUserDialog() {
                 role: "Resident"
             })
 
+            queryClient.invalidateQueries({ queryKey: ["users"] })
             toast.success("The user has been successfully added!")
             form.reset()
             setOpen(false)
         } catch (error: any) {
-            toast.error(error.response?.data?.message || "Error creating a user")
+            toast.error(error.response?.data || "Error creating a user")
         }
     }
 
