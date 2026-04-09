@@ -159,7 +159,17 @@ app.MapPost("/api/core/auth/refresh", async (
 
 });
 
-app.MapPost("api/core/assignments-get", async (
+app.MapPost("/api/core/rooms-get", async(
+    [FromBody] RoomsListRequest request,
+    IRoomService service,
+    CancellationToken cancellationToken) =>
+{
+    var result = await service.GetAllAsync(request.Pagination, cancellationToken);
+
+    return Results.Ok(result);    
+}).RequireAuthorization("AdminOnly");
+
+app.MapPost("/api/core/assignments-get", async (
     [FromBody] ResidentsListRequest request,
     IAssignmentService service,
     CancellationToken cancellationToken) =>
