@@ -60,40 +60,41 @@ public sealed class JwtService : IJwtService
 	}
 
 	public async ValueTask<TokenModel> GenerateTokensAsync(User? user, CancellationToken cancellationToken = default)
-	{
-		cancellationToken.ThrowIfCancellationRequested();
+    {
+        if (user is null) throw new ArgumentNullException(nameof(user));
 
-		if (user is null)
-		{
-			throw new ArgumentNullException(nameof(user));
-		}
-		
-		var accessToken = GenerateJwtToken(user); 
+        var accessToken = GenerateJwtToken(user, cancellationToken); 
     
-		var refreshToken = new RefreshToken
-		{
-			TokenBody = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
-			Expires = DateTime.UtcNow.AddDays(7),
-			Created = DateTime.UtcNow,
-			UserId = user.Id,
-		};
+        var refreshToken = new RefreshToken
+        {
+            TokenBody = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
+            Expires = DateTime.UtcNow.AddDays(7),
+            Created = DateTime.UtcNow,
+            UserId = user.Id,
+        };
 
-		await _repository.AddAsync(refreshToken);
-		
-		return new TokenModel(accessToken, refreshToken.TokenBody);
-	}
+        await _repository.AddAsync(refreshToken, cancellationToken);
+        
+        return new TokenModel(accessToken, refreshToken.TokenBody);
+    }
 
-	public async ValueTask<RefreshToken> GetByBodyAsync(string tokenBody, CancellationToken cancellationToken = default)
-	{
-		cancellationToken.ThrowIfCancellationRequested();
-		
-		var token = await _repository.GetByBodyAsync(tokenBody);
+	public async ValueTask<RefreshToken?> GetByBodyAsync(string tokenBody, CancellationToken cancellationToken = default)
+    {
+        return await _repository.GetByBodyAsync(tokenBody, cancellationToken);
+    }
 
-		if (token is null)
-		{
-			throw new ArgumentException(nameof(tokenBody));
-		}
+	public async ValueTask<TokenModel> RotateTokensAsync(string refreshTokenBody, CancellationToken cancellationToken = default)
+    {
+        var token = await _repository.GetByBodyAsync(refreshTokenBody, cancellationToken);
 
-		return token;
-	}
+        if (token is null || !token.IsActive)
+        {
+            throw new SecurityTokenException("Token is invalid, expired or already revoked");
+        }
+
+        token.Revoked = DateTime.UtcNow;
+        await _repository.UpdateAsync(token, cancellationToken);
+
+        return await GenerateTokensAsync(token.User, cancellationToken);
+    }
 }

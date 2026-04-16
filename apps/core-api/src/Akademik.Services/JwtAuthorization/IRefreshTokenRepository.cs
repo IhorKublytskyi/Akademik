@@ -6,6 +6,7 @@ namespace Akademik.Services.JwtAuthorization;
 
 public interface IRefreshTokenRepository
 {
-	Task<RefreshToken> AddAsync(RefreshToken refreshToken, CancellationToken cancellationToken = default);	
-	Task<RefreshToken?> GetByBodyAsync(string tokenBody, CancellationToken cancellationToken = default);
+	ValueTask<RefreshToken> AddAsync(RefreshToken refreshToken, CancellationToken cancellationToken = default);	
+	ValueTask<RefreshToken?> GetByBodyAsync(string tokenBody, CancellationToken cancellationToken = default);
+	ValueTask UpdateAsync(RefreshToken refreshToken, CancellationToken cancellationToken = default);
 }

@@ -13,7 +13,7 @@ public sealed class RefreshTokenRepository : IRefreshTokenRepository
 		_context = context;
 	}
 
-	public async Task<RefreshToken> AddAsync(RefreshToken refreshToken, CancellationToken cancellationToken = default)
+	public async ValueTask<RefreshToken> AddAsync(RefreshToken refreshToken, CancellationToken cancellationToken = default)
 	{
 		await _context.RefreshTokens.AddAsync(refreshToken, cancellationToken);
 		await _context.SaveChangesAsync(cancellationToken);
@@ -21,7 +21,7 @@ public sealed class RefreshTokenRepository : IRefreshTokenRepository
 		return refreshToken;
 	}
 
-	public async Task<RefreshToken?> GetByBodyAsync(string tokenBody, CancellationToken cancellationToken = default)
+	public async ValueTask<RefreshToken?> GetByBodyAsync(string tokenBody, CancellationToken cancellationToken = default)
 	{
 		var token =await _context.RefreshTokens
 			.AsNoTracking()
@@ -30,4 +30,11 @@ public sealed class RefreshTokenRepository : IRefreshTokenRepository
 
 		return token;
 	}
+
+    public async ValueTask UpdateAsync(RefreshToken refreshToken, CancellationToken cancellationToken = default)
+    {
+        await _context.RefreshTokens
+		.Where(rt => rt.Id == refreshToken.Id)
+		.ExecuteUpdateAsync(setPropertyCalls => setPropertyCalls.SetProperty(rt => rt.Revoked, refreshToken.Revoked), cancellationToken);
+    }
 }
