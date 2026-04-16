@@ -31,9 +31,6 @@ export default function RoomsPage() {
                     <p className="text-muted-foreground">Manage dormitory rooms, floors, and capacities.</p>
                 </div>
                 {/* <AddRoomDialog /> */}
-                <div className="h-10 px-4 py-2 bg-primary text-primary-foreground rounded-md opacity-50 cursor-not-allowed">
-                    Add Room (Coming Soon)
-                </div>
             </div>
 
             <div className="rounded-md border bg-card">
@@ -63,7 +60,7 @@ export default function RoomsPage() {
                         ) : (
                             rooms.map((room: Room) => (
                                 <TableRow key={room.id}>
-                                    <TableCell className="font-medium text-lg">{room.number}</TableCell>
+                                    <TableCell className="font-medium text-md">{room.number}</TableCell>
                                     <TableCell>Floor {room.floor}</TableCell>
                                     <TableCell>
                                         <div className="flex items-center gap-1">
