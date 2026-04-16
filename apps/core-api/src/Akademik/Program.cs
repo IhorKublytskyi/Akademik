@@ -27,6 +27,9 @@ builder.Services.AddScoped<IRoomRepository, RoomRepository>();
 builder.Services.AddScoped<IAssignmentService, AssignmentService>();
 builder.Services.AddScoped<IAssignmentRepository, AssignmentRepository>();
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
@@ -66,6 +69,16 @@ builder.Services.AddAuthorization(options =>
 });
 
 var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+        options.RoutePrefix = string.Empty;
+    });
+}
 
 app.UseCors("AllowFrontend");
 
@@ -132,7 +145,7 @@ app.MapPost("/api/core/auth/register", async (
     await userService.CreateAsync(newUser, cancellationToken);
 
     return Results.Ok(UserModel.FromUser(newUser));
-});
+}).RequireAuthorization("AdminOnly");
 
 app.MapPost("/api/core/auth/refresh", async (
     [FromBody] RefreshRequest request,
@@ -141,23 +154,16 @@ app.MapPost("/api/core/auth/refresh", async (
 {
     try
     {
-        var token = await jwtService.GetByBodyAsync(request.RefreshToken, cancellationToken);
-
-        token.Revoked = DateTime.UtcNow;
-
-        var newTokens = await jwtService.GenerateTokensAsync(token.User, cancellationToken);
-
-        Console.WriteLine($"Access Token: {newTokens.AccessToken}");
-        Console.WriteLine($"Refresh Token: {newTokens.RefreshToken}");
-
+        var newTokens = await jwtService.RotateTokensAsync(request.RefreshToken, cancellationToken);
+        
         return Results.Ok(newTokens);
     }
     catch (Exception ex)
     {
-        return Results.Problem(ex.Message);
+        return Results.Json(new { error = ex.Message }, statusCode: 401);
     }
 
-});
+}).RequireAuthorization();
 
 app.MapPost("/api/core/rooms-get", async(
     [FromBody] RoomsListRequest request,
@@ -209,7 +215,7 @@ app.MapPost("/api/core/users-get", async (
         Items = result,
         Count = users.Count
     });
-});
+}).RequireAuthorization("AdminOnly");
 
 app.MapPost("/api/core/users-edit", async (
     [FromBody] UpdateUserRequest request,
