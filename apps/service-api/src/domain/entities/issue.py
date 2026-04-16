@@ -27,5 +27,9 @@ class IssueResponse(BaseModel):
         from_attributes = True
 
 
+class IssueStatusUpdate(BaseModel):
+    status: IssueStatus
+
+
 class IssueClose(BaseModel):
     reason: Optional[str] = None

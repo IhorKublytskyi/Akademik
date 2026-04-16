@@ -16,3 +16,11 @@ class ComplaintAlreadyClosed(Exception):
 
 class AccessDenied(Exception):
     pass
+
+
+class EventNotFound(Exception):
+    pass
+
+
+class EventAccessDenied(Exception):
+    pass

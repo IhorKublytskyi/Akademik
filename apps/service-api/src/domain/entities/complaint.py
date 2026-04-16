@@ -25,5 +25,9 @@ class ComplaintResponse(BaseModel):
         from_attributes = True
 
 
+class ComplaintStatusUpdate(BaseModel):
+    status: ComplaintStatus
+
+
 class ComplaintClose(BaseModel):
     reason: Optional[str] = None
