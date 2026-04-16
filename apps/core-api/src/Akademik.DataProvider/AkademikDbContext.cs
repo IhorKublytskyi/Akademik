@@ -28,7 +28,7 @@ public class DbConextDesignTimeFactory : IDesignTimeDbContextFactory<AkademikDbC
     {
         var optionsBuilder = new DbContextOptionsBuilder<AkademikDbContext>();
         
-        optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=Akademik;Username=postgres;Password=arma03042003");
+        optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=Akademik;Username=postgres;Password=root");
 
         return new AkademikDbContext(optionsBuilder.Options);
     }

@@ -1,4 +1,4 @@
-﻿using Akademik.DataProvider.Models;
+﻿					using Akademik.DataProvider.Models;
 
 namespace Akademik.Services.Assignments;
 
