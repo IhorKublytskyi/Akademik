@@ -14,3 +14,9 @@ export interface RoomsListResponse {
     page: number;
     pageSize: number;
 }
+
+export interface UpdateRoomRequest {
+    id: number;
+    capacity: number;
+    status: string;
+}

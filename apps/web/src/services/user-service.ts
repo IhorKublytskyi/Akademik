@@ -19,4 +19,4 @@ export const getUsersList = async (pageNumber = 1, pageSize = 10): Promise<Users
 export const updateUser = async (data: UpdateUserRequest) => {
     const response = await api.post("/api/core/users-edit", data)
     return response.data
-};
+}

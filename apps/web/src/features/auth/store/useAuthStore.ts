@@ -1,7 +1,7 @@
 import { create } from "zustand"
 import Cookies from "js-cookie"
 import { api } from "@/shared/api/api-client"
-import { User } from "@/shared/types/user";
+import { User } from "@/shared/types/user"
 
 interface AuthState {
     user: User | null;
@@ -44,10 +44,6 @@ export const useAuthStore = create<AuthState>((set) => ({
     logout: () => {
         Cookies.remove("auth_token")
         Cookies.remove("refresh_token")
-        set({ user: null, token: null, refreshToken: null, isAuthenticated: false })
-
-        if (typeof window !== "undefined") {
-            window.location.href = "/login"
-        }
+        window.location.href = "/login"
     },
 }))
