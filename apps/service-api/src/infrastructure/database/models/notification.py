@@ -30,6 +30,7 @@ class NotificationModel(Base):
     status = Column(SQLEnum(NotificationStatus), default=NotificationStatus.PENDING, nullable=False)
     scheduled_at = Column(DateTime, nullable=True)
     sent_at = Column(DateTime, nullable=True)
+    retry_count = Column(Integer, default=0, nullable=False)
 
     def __repr__(self):
         return f"<Notification(id={self.id}, channel={self.channel}, status={self.status})>"

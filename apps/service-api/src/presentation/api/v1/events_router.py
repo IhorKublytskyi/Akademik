@@ -2,10 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.exceptions.exceptions import EventAccessDenied, EventNotFound
+from src.application.ports.notification_port import NotificationPort
 from src.application.services import event_service
 from src.domain.entities.event import EventCreate, EventResponse, EventUpdate, RoomInspectionCreate
 from src.infrastructure.auth.jwt_validator import TokenPayload
-from src.presentation.dependencies import get_current_user, get_db
+from src.presentation.dependencies import get_current_user, get_db, get_notification_service
 
 _ADMIN_ROLES = {"Admin", "ADMIN"}
 
@@ -58,13 +59,18 @@ async def delete_event(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You can only delete your own personal events")
 
 
-@router.post("/v1/admin/events/room-inspections", response_model=list[EventResponse], status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/v1/admin/events/room-inspections",
+    response_model=list[EventResponse],
+    status_code=status.HTTP_201_CREATED,
+)
 async def create_room_inspections(
     data: RoomInspectionCreate,
     db: AsyncSession = Depends(get_db),
     user: TokenPayload = Depends(get_current_user),
+    notifier: NotificationPort = Depends(get_notification_service),
 ):
     if user.role not in _ADMIN_ROLES:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required")
 
-    return await event_service.create_room_inspections(db, data=data)
+    return await event_service.create_room_inspections(db, data=data, notifier=notifier)
