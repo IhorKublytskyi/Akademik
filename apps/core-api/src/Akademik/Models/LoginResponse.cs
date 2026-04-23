@@ -1,3 +1,9 @@
-﻿namespace Akademik.Models;
+using Akademik.Services.Models;
 
-public sealed record LoginResponse(string Token, string Role, string Expiry);
+namespace Akademik.Models;
+
+public class LoginResponse
+{
+    public UserModel User { get; set; } = null!;
+    public TokenModel Token { get; set; } = null!;
+}

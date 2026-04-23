@@ -31,4 +31,11 @@ public sealed class RoomService : IRoomService
 
 		return room;
 	}
+
+	public async ValueTask<Room> UpdateAsync(Room room, CancellationToken cancellationToken)
+	{
+		await _repository.UpdateAsync(room, cancellationToken);
+
+		return room;
+	}
 }

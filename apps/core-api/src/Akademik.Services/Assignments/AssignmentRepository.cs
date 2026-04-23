@@ -44,4 +44,31 @@ public sealed class AssignmentRepository : IAssignmentRepository
 			Count = await countTask,
 		};
 	}
+
+	public async ValueTask<int> GetActiveAssignmentsCountByRoomIdAsync(int roomId, CancellationToken cancellationToken)
+	{
+		return await _dbContext.Assignments
+			.CountAsync(a => a.RoomId == roomId && a.IsActive, cancellationToken);
+	}
+
+	public async ValueTask<bool> HasActiveAssignmentByUserIdAsync(int userId, CancellationToken cancellationToken)
+	{
+		return await _dbContext.Assignments
+			.AnyAsync(a => a.UserId == userId && a.IsActive, cancellationToken);
+	}
+
+	public async ValueTask<Assignment?> GetActiveAssignmentByUserIdAsync(int userId, CancellationToken cancellationToken)
+	{
+		return await _dbContext.Assignments
+			.AsNoTracking()
+			.FirstOrDefaultAsync(a => a.UserId == userId && a.IsActive, cancellationToken);
+	}
+
+	public async ValueTask<List<User>> GetRoommatesByRoomIdAsync(int roomId, int currentUserId, CancellationToken cancellationToken)
+	{
+		return await _dbContext.Assignments
+			.Where(a => a.RoomId == roomId && a.IsActive && a.UserId != currentUserId)
+			.Select(a => a.User!)
+			.ToListAsync(cancellationToken);
+	}
 }
