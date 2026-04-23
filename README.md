@@ -1,8 +1,79 @@
 # Akademik
 
-A dormitory management platform that helps residents report issues, submit complaints, receive notifications, and manage QR-based access — all in one place.
+Platforma do zarządzania akademikiem — zgłaszanie usterek, składanie skarg, powiadomienia i dostęp przez kody QR w jednym miejscu.
 
-## Architecture
+## Opis projektu
+
+Aplikacja umożliwia mieszkańcom akademika zgłaszanie problemów technicznych, składanie skarg oraz otrzymywanie powiadomień (e-mail, SMS, push). System obsługuje również QR-owy dostęp do budynku i pomieszczeń oraz zarządzanie wydarzeniami (inspekcje, terminy płatności).
+
+Posiada panel administracyjny do zarządzania użytkownikami, zgłoszeniami i dostępem.
+
+## Sprint Plan
+
+**Milestone 1 — Foundation**
+- [x] Set up FastAPI project and base architecture
+- [x] Configure DbContext / entities / configurations
+- [x] Frontend setup and infrastructure
+- [x] Set up Alembic
+- [x] Configure JWT validator
+- [x] Configure dependencies / DI
+- [x] Implement /me router
+
+**Milestone 2 — Core API**
+- [ ] Implement Issues API
+- [ ] Implement Events API
+- [ ] Implement Complaints API
+
+**Milestone 3 — Integration**
+- [ ] Prepare notification service and email integration
+- [ ] Prepare scheduled tasks structure and service interaction
+- [ ] Global UI and auth flow
+- [ ] Integration of backend with frontend
+
+**Milestone 4 — MVP / Demo**
+- [ ] Testing
+- [ ] Bug fixing
+- [ ] Final integration
+- [ ] Deployment readiness
+
+## Autorzy
+
+- *(uzupełnić — imię nazwisko – rola)*
+- *(uzupełnić — imię nazwisko – rola)*
+- *(uzupełnić — imię nazwisko – rola)*
+
+## Technologie
+
+**Frontend:**
+- Next.js 16, React 19
+- Tailwind CSS, shadcn/ui
+- Zustand, TanStack Query
+
+**Backend:**
+- ASP.NET Core 10 (C#) — core-api
+- FastAPI, SQLAlchemy (async), Alembic — service-api
+
+**Baza danych:**
+- PostgreSQL 16
+
+**Infrastruktura:**
+- RabbitMQ 3
+- Nginx (reverse proxy)
+- Docker Compose
+
+## Funkcjonalności
+
+- [x] Rejestracja i logowanie mieszkańców (JWT + Refresh Token)
+- [x] Zarządzanie użytkownikami przez administratora
+- [x] Zgłaszanie usterek (priorytety, statusy)
+- [x] Składanie skarg (opcjonalnie anonimowo)
+- [x] Powiadomienia (EMAIL / SMS / APP)
+- [x] Kody QR z limitem czasowym (dostęp do budynku/pokoi)
+- [x] Zarządzanie wydarzeniami (inspekcje, terminy)
+- [ ] Panel statystyk dla administratora
+- [ ] Historia zdarzeń / audit log
+
+## Architektura projektu
 
 ```
 ┌─────────┐     ┌────────────┐     ┌─────────────┐
@@ -20,126 +91,124 @@ A dormitory management platform that helps residents report issues, submit compl
           postgres          rabbitmq
 ```
 
-| Service | Responsibility |
-|---|---|
-| **core-api** (C#) | Auth, user management, issues JWT tokens |
-| **service-api** (Python) | Issues, complaints, notifications, QR codes, events |
-| **web** (Next.js) | Student-facing UI |
-| **nginx** | Reverse proxy — routes `/api/core/` and `/api/service/` |
+| Serwis | Odpowiedzialność |
+|--------|-----------------|
+| **core-api** (C#) | Auth, zarządzanie użytkownikami, wydawanie JWT |
+| **service-api** (Python) | Usterki, skargi, powiadomienia, QR, eventy |
+| **web** (Next.js) | Interfejs dla mieszkańców |
+| **nginx** | Reverse proxy — `/api/core/` i `/api/service/` |
 
-## Tech Stack
+JWT wystawiany przez `core-api`, walidowany przez `service-api` (wspólny sekret `JWT_SECRET`).
 
-- **core-api** — ASP.NET Core, C#
-- **service-api** — FastAPI, SQLAlchemy (async), Alembic, asyncpg, PyJWT
-- **web** — Next.js 16, React 19, Tailwind CSS, shadcn/ui, Zustand, TanStack Query
-- **Infra** — PostgreSQL 16, RabbitMQ 3, Nginx, Docker Compose
+## Instalacja
 
-## Domain Models FastAPI
-
-| Model | Description |
-|---|---|
-| `Issue` | Maintenance request from a resident (priority + status lifecycle) |
-| `Complaint` | Feedback or complaint, optionally anonymous |
-| `Notification` | Outbound messages via EMAIL / SMS / APP |
-| `QRCode` | Time-limited access token for building or room entry |
-| `Event` | Scheduled event (room inspection, payment deadline, etc.) |
-
-## JWT Flow
-
-```
-core-api  ──issues──▶  JWT (HS256, shared secret)
-                              │
-service-api  ◀──validates─────┘  (never issues)
-```
-
-`service-api` only validates tokens signed by `core-api`. The shared secret is set via `JWT_SECRET` env variable.
-
-## Getting Started
+1. Sklonuj repozytorium:
 
 ```bash
-cp .env.example .env   # set JWT_SECRET and DB credentials
+git clone https://github.com/nazwa/akademik.git
+cd akademik
+```
+
+2. Skonfiguruj zmienne środowiskowe:
+
+```bash
+cp .env.example .env
+```
+
+Uzupełnij `.env`: `JWT_SECRET`, dane dostępowe do bazy danych.
+
+## Uruchomienie aplikacji
+
+### Docker (zalecane)
+
+```bash
 docker compose up -d
 ```
 
-Migrations (run inside the `service-api` container):
+### Migracje bazy danych
 
 ```bash
+docker exec -it service-api bash
 cd apps/service-api
 alembic upgrade head
 ```
 
+### core-api (lokalnie)
 
+```bash
+dotnet ef database update --project ./Akademik.DataProvider --startup-project Akademik
+dotnet run --project ./Akademik
+```
 
-## Project Structure
+## Instrukcja użytkownika
+
+1. Otwórz przeglądarkę i przejdź pod adres: `http://localhost`
+2. Zaloguj się podanymi przez administratora danymi
+3. Z panelu głównego możesz:
+   - zgłosić usterkę (zakładka *Usterki*)
+   - złożyć skargę (zakładka *Skargi*)
+   - sprawdzić powiadomienia
+   - pobrać/wygenerować kod QR do wejścia
+
+Konto administratora umożliwia rejestrowanie nowych mieszkańców i zarządzanie zgłoszeniami.
+
+## Struktura repozytorium
 
 ```
 apps/
-  core-api/       # C# — auth & user management
-  service-api/    # Python — domain services
-    alembic/      # database migrations
+  core-api/         — C#, auth i zarządzanie użytkownikami
+    Akademik/
+    Akademik.Services/
+    Akademik.DataProvider/
+  service-api/      — Python, serwisy domenowe
+    alembic/        — migracje bazy danych
     src/
       domain/
       application/
       infrastructure/
-        auth/         # JWT validation
-        database/     # async SQLAlchemy + models
+        auth/       — walidacja JWT
+        database/   — SQLAlchemy + modele
       presentation/
-        api/v1/       # HTTP endpoints
-  web/            # Next.js frontend
-nginx/            # reverse proxy config
+        api/v1/     — endpointy HTTP
+  web/              — frontend Next.js
+nginx/              — konfiguracja reverse proxy
 docker-compose.yml
-```
----
-
-# core-api
-
-A dormitory management platform designed to automate resident life, from secure access to issue reporting.
-
-## Project Progress: Week 1 (Current State)
-
-We have established the foundational **Core API** (ASP.NET Core 10) including the database schema for users and a robust authentication system with token rotation.
-
-## 1. Architecture Overview
-The backend is organized into specialized modules to ensure a clean separation of concerns:
-
-| Layer | Project Type | Responsibility |
-| :--- | :--- | :--- |
-| **Akademik** | Executable (API) | Program entry point, Middleware, Controllers/Endpoints |
-| **Akademik.Services** | Class Library | Business logic: JWT Generation, User Registration, Password Hashing |
-| **Akademik.DataProvider** | Class Library | Database context, Entity configurations, Migrations, Models |
-
-## Implemented Domain Models (`core-api`)
-The **User** entity is fully configured using EF Core Fluent API with the following database-level optimizations:
-
-* **User Schema**: Fields include `FirstName`, `LastName`, `Email` (Unique), `PasswordHash`, `Role` (Admin/Resident), and `Status` (Active/Blocked).
-* **Database Indexes**:
-    * `Index_Email_Unique`: Enforces email uniqueness at the DB level.
-    * `Index_Fullname`: Composite index on `LastName` + `FirstName` for optimized searching.
-    * `Index_ActiveOnly`: A filtered index for faster lookups during the login process.
-* **RefreshTokens**: Dedicated storage for long-lived session management and secure token rotation.
-
-## Authentication & Security
-We have implemented a secure authentication flow based on the project's security requirements:
-
-* **Password Hashing**: Powered by `BCrypt.Net` to ensure one-way cryptographic protection of user credentials.
-* **JWT Access Tokens**: Short-lived tokens containing claims: `sub` (ID), `email`, `role`, and `status`.
-* **Token Rotation**: Use of Refresh Tokens to allow users to stay logged in securely without re-entering passwords, with the ability to revoke sessions instantly.
-
-## API Endpoints (Core API)
-
-| Method | Path | Auth | Description |
-| :--- | :--- | :--- | :--- |
-| `POST` | `/api/core/auth/login` | Public | Validates credentials; returns Access & Refresh tokens. |
-| `POST` | `/api/core/auth/register` | Admin | Registers new residents. Restricted to Administrator role. |
-| `POST` | `/api/core/auth/refresh` | Public | Exchanges a valid Refresh Token for a new pair of tokens. |
-
-## Getting started
-- Apply migration 
-```bash
-dotnet ef migration database update --project ./Akademik.DataProvider --startup-project Akademik
-```
-- Run executable
-```bash
-dotnet run --project ./Akademik
+.env.example
 ```
 
+## API
+
+### core-api
+
+| Metoda | Ścieżka | Auth | Opis |
+|--------|---------|------|------|
+| `POST` | `/api/core/auth/login` | Publiczny | Logowanie; zwraca Access + Refresh token |
+| `POST` | `/api/core/auth/register` | Admin | Rejestracja nowego mieszkańca |
+| `POST` | `/api/core/auth/refresh` | Publiczny | Wymiana Refresh Token na nową parę tokenów |
+
+### service-api
+
+| Metoda | Ścieżka | Auth | Opis |
+|--------|---------|------|------|
+| `GET/POST` | `/api/service/issues` | JWT | Lista / tworzenie usterek |
+| `GET/POST` | `/api/service/complaints` | JWT | Lista / tworzenie skarg |
+| `GET` | `/api/service/notifications` | JWT | Powiadomienia użytkownika |
+| `GET/POST` | `/api/service/qrcodes` | JWT | Generowanie i weryfikacja kodów QR |
+| `GET/POST` | `/api/service/events` | JWT | Eventy akademika |
+
+## Zrzuty ekranu
+
+*(dodać po ukończeniu UI)*
+
+```
+![login](docs/screenshots/login.png)
+![dashboard](docs/screenshots/dashboard.png)
+```
+
+## Status projektu
+
+Projekt w trakcie rozwoju — realizowany w ramach kursu Projekt Zespołowy Systemów Informatycznych 2026.
+
+## Licencja
+
+Projekt edukacyjny.
