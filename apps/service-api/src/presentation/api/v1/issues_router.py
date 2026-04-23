@@ -4,11 +4,12 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.exceptions.exceptions import IssueAlreadyClosed, IssueNotFound
+from src.application.ports.notification_port import NotificationPort
 from src.application.services import issue_service
 from src.domain.entities.issue import IssueCreate, IssueResponse, IssueStatusUpdate
-from src.domain.enums import IssueStatus, UserRole
+from src.domain.enums import IssueStatus
 from src.infrastructure.auth.jwt_validator import TokenPayload
-from src.presentation.dependencies import get_current_user, get_db
+from src.presentation.dependencies import get_current_user, get_db, get_notification_service
 
 _ADMIN_ROLES = {"Admin", "ADMIN"}
 
@@ -20,9 +21,9 @@ async def create_issue(
     data: IssueCreate,
     db: AsyncSession = Depends(get_db),
     user: TokenPayload = Depends(get_current_user),
+    notifier: NotificationPort = Depends(get_notification_service),
 ):
-    issue = await issue_service.create_issue(db, user_id=user.user_id, data=data)
-    return issue
+    return await issue_service.create_issue(db, user_id=user.user_id, data=data, notifier=notifier)
 
 
 @router.get("", response_model=list[IssueResponse])
@@ -31,13 +32,12 @@ async def list_issues(
     db: AsyncSession = Depends(get_db),
     user: TokenPayload = Depends(get_current_user),
 ):
-    issues = await issue_service.get_issues(
+    return await issue_service.get_issues(
         db,
         user_id=user.user_id,
         role=user.role,
         status_filter=issue_status,
     )
-    return issues
 
 
 @router.patch("/{issue_id}/status", response_model=IssueResponse)
@@ -46,15 +46,14 @@ async def update_issue_status(
     data: IssueStatusUpdate,
     db: AsyncSession = Depends(get_db),
     user: TokenPayload = Depends(get_current_user),
+    notifier: NotificationPort = Depends(get_notification_service),
 ):
     if user.role not in _ADMIN_ROLES:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required")
 
     try:
-        issue = await issue_service.update_issue_status(db, issue_id=issue_id, data=data)
+        return await issue_service.update_issue_status(db, issue_id=issue_id, data=data, notifier=notifier)
     except IssueNotFound:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Issue not found")
     except IssueAlreadyClosed:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Issue is already closed")
-
-    return issue

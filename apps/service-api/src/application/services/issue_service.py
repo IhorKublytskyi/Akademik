@@ -4,7 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.exceptions.exceptions import AccessDenied, IssueAlreadyClosed, IssueNotFound
-from src.application.services.notification_service import create_notification
+from src.application.ports.notification_port import NotificationPort
 from src.domain.entities.issue import IssueCreate, IssueStatusUpdate
 from src.domain.enums import IssueStatus
 from src.infrastructure.database.models.issue import IssueModel
@@ -17,6 +17,7 @@ async def create_issue(
     db: AsyncSession,
     user_id: int,
     data: IssueCreate,
+    notifier: NotificationPort,
 ) -> IssueModel:
     issue = IssueModel(
         user_id=user_id,
@@ -29,8 +30,7 @@ async def create_issue(
     db.add(issue)
     await db.flush()
 
-    await create_notification(
-        db,
+    await notifier.notify(
         user_id=user_id,
         title="Заявка создана",
         content=f'Ваша заявка "{data.title}" успешно зарегистрирована.',
@@ -64,6 +64,7 @@ async def update_issue_status(
     db: AsyncSession,
     issue_id: int,
     data: IssueStatusUpdate,
+    notifier: NotificationPort,
 ) -> IssueModel:
     issue = await db.get(IssueModel, issue_id)
     if issue is None:
@@ -80,8 +81,7 @@ async def update_issue_status(
 
     await db.flush()
 
-    await create_notification(
-        db,
+    await notifier.notify(
         user_id=issue.user_id,
         title="Статус заявки изменён",
         content=f'Статус вашей заявки "{issue.title}" изменён: {old_status} → {data.status}.',

@@ -2,7 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.exceptions.exceptions import EventAccessDenied, EventNotFound
-from src.application.services.notification_service import create_notification
+from src.application.ports.notification_port import NotificationPort
 from src.domain.entities.event import EventCreate, EventUpdate, RoomInspectionCreate
 from src.domain.enums import EventSource, EventType
 from src.infrastructure.database.models.event import EventModel
@@ -87,6 +87,7 @@ async def delete_event(
 async def create_room_inspections(
     db: AsyncSession,
     data: RoomInspectionCreate,
+    notifier: NotificationPort,
 ) -> list[EventModel]:
     events = []
     for uid in data.user_ids:
@@ -105,8 +106,7 @@ async def create_room_inspections(
     await db.flush()
 
     for uid in data.user_ids:
-        await create_notification(
-            db,
+        await notifier.notify(
             user_id=uid,
             title="Запланирован контроль комнаты",
             content=f"{data.title} — {data.start_at.strftime('%d.%m.%Y %H:%M')}",

@@ -4,7 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.exceptions.exceptions import ComplaintAlreadyClosed, ComplaintNotFound
-from src.application.services.notification_service import create_notification
+from src.application.ports.notification_port import NotificationPort
 from src.domain.entities.complaint import ComplaintCreate, ComplaintStatusUpdate
 from src.domain.enums import ComplaintStatus
 from src.infrastructure.database.models.complaint import ComplaintModel
@@ -17,6 +17,7 @@ async def create_complaint(
     db: AsyncSession,
     user_id: int,
     data: ComplaintCreate,
+    notifier: NotificationPort,
 ) -> ComplaintModel:
     complaint = ComplaintModel(
         user_id=None if data.is_anonymous else user_id,
@@ -29,8 +30,7 @@ async def create_complaint(
     await db.flush()
 
     if not data.is_anonymous:
-        await create_notification(
-            db,
+        await notifier.notify(
             user_id=user_id,
             title="Жалоба зарегистрирована",
             content="Ваша жалоба принята и будет рассмотрена.",
@@ -64,6 +64,7 @@ async def update_complaint_status(
     db: AsyncSession,
     complaint_id: int,
     data: ComplaintStatusUpdate,
+    notifier: NotificationPort,
 ) -> ComplaintModel:
     complaint = await db.get(ComplaintModel, complaint_id)
     if complaint is None:
@@ -81,8 +82,7 @@ async def update_complaint_status(
     await db.flush()
 
     if complaint.user_id is not None:
-        await create_notification(
-            db,
+        await notifier.notify(
             user_id=complaint.user_id,
             title="Статус жалобы изменён",
             content=f"Статус вашей жалобы изменён: {old_status} → {data.status}.",
