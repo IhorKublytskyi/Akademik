@@ -52,4 +52,10 @@ public class RoomRepository : IRoomRepository
         await _dbContext.Rooms.AddAsync(room, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
+
+    public async ValueTask UpdateAsync(Room room, CancellationToken cancellationToken)
+    {
+        _dbContext.Rooms.Update(room);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
 }

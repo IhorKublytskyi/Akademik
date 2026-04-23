@@ -8,9 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import clsx from "clsx"
 import { Building, Users } from "lucide-react"
 
-// TODO: Add
-// import AddRoomDialog from "@/features/rooms/ui/add-room-dialog"
-// import RoomActions from "@/features/rooms/ui/room-actions"
+import RoomActions from "@/features/rooms/ui/room-actions"
 
 export default function RoomsPage() {
     const { data, isLoading, error } = useQuery({
@@ -30,7 +28,6 @@ export default function RoomsPage() {
                     <h1 className="text-3xl font-bold tracking-tight">Rooms</h1>
                     <p className="text-muted-foreground">Manage dormitory rooms, floors, and capacities.</p>
                 </div>
-                {/* <AddRoomDialog /> */}
             </div>
 
             <div className="rounded-md border bg-card">
@@ -82,8 +79,7 @@ export default function RoomsPage() {
                                         </Badge>
                                     </TableCell>
                                     <TableCell>
-                                        {/* <RoomActions room={room} /> */}
-                                        <span className="text-xs text-muted-foreground">Actions pending</span>
+                                        <RoomActions room={room} />
                                     </TableCell>
                                 </TableRow>
                             ))

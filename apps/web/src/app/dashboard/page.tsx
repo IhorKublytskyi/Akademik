@@ -8,7 +8,7 @@ import { LogOut, User as UserIcon } from "lucide-react"
 export default function DashboardPage() {
     const user = useAuthStore((state) => state.user)
     const logout = useAuthStore((state) => state.logout)
-    const username = user?.firstName + " " +user?.lastName;
+    const username = user?.firstName + " " + user?.lastName;
     console.log(user)
     return (
         <div className="flex flex-col gap-6">
@@ -38,7 +38,7 @@ export default function DashboardPage() {
 
                         <Button
                             variant="outline"
-                            className="w-full mt-6 text-destructive hover:text-destructive hover:bg-destructive/10"
+                            className="w-full mt-6 text-destructive hover:text-destructive hover:bg-destructive/10 cursor-pointer hover:border-destructive"
                             onClick={logout}
                         >
                             <LogOut className="mr-2 h-4 w-4" />
