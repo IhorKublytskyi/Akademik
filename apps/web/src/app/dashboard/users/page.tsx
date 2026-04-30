@@ -18,7 +18,16 @@ export default function UsersPage() {
     const currentUser = useAuthStore(s => s.user)
 
     const filteredUsers = data?.items
-        ?.filter((u: User) => u.id !== currentUser?.id) || []
+        ?.filter((u: User) => u.id !== currentUser?.id)
+        ?.sort((a, b) => {
+            const date1 = new Date(a.createdAt)
+            const timestamp1 = date1.getTime()
+
+            const date2 = new Date(b.createdAt)
+            const timestamp2 = date2.getTime()
+
+            return timestamp2 - timestamp1
+        }) || []
 
     if (isLoading) return <div>Loading users...</div>
     if (error) return <div>Error: {(error as any).message}</div>

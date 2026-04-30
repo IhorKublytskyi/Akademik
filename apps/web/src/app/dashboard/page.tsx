@@ -8,8 +8,6 @@ import { LogOut, User as UserIcon } from "lucide-react"
 export default function DashboardPage() {
     const user = useAuthStore((state) => state.user)
     const logout = useAuthStore((state) => state.logout)
-    const username = user?.firstName + " " + user?.lastName;
-    console.log(user)
     return (
         <div className="flex flex-col gap-6">
             <div>

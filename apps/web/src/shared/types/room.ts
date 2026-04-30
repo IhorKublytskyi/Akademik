@@ -17,6 +17,8 @@ export interface RoomsListResponse {
 
 export interface UpdateRoomRequest {
     id: number;
+    number: string;
+    floor: number;
     capacity: number;
     status: string;
 }

@@ -14,4 +14,4 @@ export const getRoomsList = async (pageNumber = 1, pageSize = 10): Promise<Rooms
 export const updateRoom = async (data: UpdateRoomRequest) => {
     const response = await api.post("/api/core/rooms-edit", data)
     return response.data
-}
+};
