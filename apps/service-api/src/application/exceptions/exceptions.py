@@ -24,3 +24,15 @@ class EventNotFound(Exception):
 
 class EventAccessDenied(Exception):
     pass
+
+
+class QRCodeNotFound(Exception):
+    pass
+
+
+class QRCodeNotActive(Exception):
+    pass
+
+
+class QRCodeAccessDenied(Exception):
+    pass
