@@ -13,14 +13,17 @@ def deliver_notification(user_id: int, title: str, content: str, channel: str) -
 
 
 async def _save(user_id: int, title: str, content: str, channel: str) -> None:
+    now = utc_now_naive()
     async with db.session_factory() as session:
         notification = NotificationModel(
             user_id=user_id,
             channel=NotificationChannel(channel),
             title=title,
             content=content,
-            status=NotificationStatus.PENDING,
-            scheduled_at=utc_now_naive(),
+            # In-app delivery = saving to DB is the delivery itself
+            status=NotificationStatus.SENT,
+            scheduled_at=now,
+            sent_at=now,
         )
         session.add(notification)
         await session.commit()

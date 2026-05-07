@@ -1,14 +1,14 @@
 from src.domain.enums.enums import (
-    UserRole,
-    IssueStatus,
-    IssuePriority,
     ComplaintStatus,
-    QRStatus,
-    QRAccessType,
-    NotificationStatus,
-    NotificationChannel,
     EventSource,
     EventType,
+    IssuePriority,
+    IssueStatus,
+    NotificationChannel,
+    NotificationStatus,
+    QRAccessType,
+    QRStatus,
+    UserRole,
 )
 
 __all__ = [

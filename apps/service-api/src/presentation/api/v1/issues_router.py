@@ -1,4 +1,3 @@
-from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -9,7 +8,11 @@ from src.application.services import issue_service
 from src.domain.entities.issue import IssueCreate, IssueResponse, IssueStatusUpdate
 from src.domain.enums import IssueStatus
 from src.infrastructure.auth.jwt_validator import TokenPayload
-from src.presentation.dependencies import get_current_user, get_db, get_notification_service
+from src.presentation.dependencies import (
+    get_current_user,
+    get_db,
+    get_notification_service,
+)
 
 _ADMIN_ROLES = {"Admin", "ADMIN"}
 
@@ -28,7 +31,7 @@ async def create_issue(
 
 @router.get("", response_model=list[IssueResponse])
 async def list_issues(
-    issue_status: Optional[IssueStatus] = None,
+    issue_status: IssueStatus | None = None,
     db: AsyncSession = Depends(get_db),
     user: TokenPayload = Depends(get_current_user),
 ):

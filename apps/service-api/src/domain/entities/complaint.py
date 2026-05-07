@@ -1,25 +1,25 @@
 from datetime import datetime
-from typing import Optional
+
 from pydantic import BaseModel
 
 from src.domain.enums import ComplaintStatus
 
 
 class ComplaintCreate(BaseModel):
-    room_id: Optional[int] = None
+    room_id: int | None = None
     content: str
     is_anonymous: bool = False
 
 
 class ComplaintResponse(BaseModel):
     id: int
-    user_id: Optional[int]
-    room_id: Optional[int]
+    user_id: int | None
+    room_id: int | None
     content: str
     is_anonymous: bool
     status: ComplaintStatus
     created_at: datetime
-    closed_at: Optional[datetime]
+    closed_at: datetime | None
 
     class Config:
         from_attributes = True
@@ -30,4 +30,4 @@ class ComplaintStatusUpdate(BaseModel):
 
 
 class ComplaintClose(BaseModel):
-    reason: Optional[str] = None
+    reason: str | None = None

@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+
 from pydantic import BaseModel
 
 from src.domain.enums import IssuePriority, IssueStatus
@@ -8,7 +8,7 @@ from src.domain.enums import IssuePriority, IssueStatus
 class IssueCreate(BaseModel):
     room_id: int
     title: str
-    description: Optional[str] = None
+    description: str | None = None
     priority: IssuePriority = IssuePriority.NORMAL
 
 
@@ -17,11 +17,11 @@ class IssueResponse(BaseModel):
     user_id: int
     room_id: int
     title: str
-    description: Optional[str]
+    description: str | None
     priority: IssuePriority
     status: IssueStatus
     created_at: datetime
-    closed_at: Optional[datetime]
+    closed_at: datetime | None
 
     class Config:
         from_attributes = True
@@ -32,4 +32,4 @@ class IssueStatusUpdate(BaseModel):
 
 
 class IssueClose(BaseModel):
-    reason: Optional[str] = None
+    reason: str | None = None

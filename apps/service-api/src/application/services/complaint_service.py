@@ -1,9 +1,11 @@
-from typing import Optional
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.application.exceptions.exceptions import ComplaintAlreadyClosed, ComplaintNotFound
+from src.application.exceptions.exceptions import (
+    ComplaintAlreadyClosed,
+    ComplaintNotFound,
+)
 from src.application.ports.notification_port import NotificationPort
 from src.domain.entities.complaint import ComplaintCreate, ComplaintStatusUpdate
 from src.domain.enums import ComplaintStatus
@@ -45,7 +47,7 @@ async def get_complaints(
     db: AsyncSession,
     user_id: int,
     role: str,
-    status_filter: Optional[ComplaintStatus] = None,
+    status_filter: ComplaintStatus | None = None,
 ) -> list[ComplaintModel]:
     stmt = select(ComplaintModel)
 
