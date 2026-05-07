@@ -1,8 +1,7 @@
-﻿using Akademik.DataProvider;
 using Akademik.DataProvider.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Akademik.Services.Rooms;
+namespace Akademik.DataProvider.Repositories;
 
 public class RoomRepository : IRoomRepository
 {
@@ -22,6 +21,7 @@ public class RoomRepository : IRoomRepository
         List<Room> rooms = await query
             .Skip(pagination.Skip)
             .Take(pagination.PageSize)
+            .Include(r => r.Assignment)
             .Select(r => new Room
             {
                 Id = r.Id,

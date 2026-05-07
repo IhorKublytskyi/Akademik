@@ -1,15 +1,25 @@
-from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.application.exceptions.exceptions import ComplaintAlreadyClosed, ComplaintNotFound
+from src.application.exceptions.exceptions import (
+    ComplaintAlreadyClosed,
+    ComplaintNotFound,
+)
 from src.application.ports.notification_port import NotificationPort
 from src.application.services import complaint_service
-from src.domain.entities.complaint import ComplaintCreate, ComplaintResponse, ComplaintStatusUpdate
+from src.domain.entities.complaint import (
+    ComplaintCreate,
+    ComplaintResponse,
+    ComplaintStatusUpdate,
+)
 from src.domain.enums import ComplaintStatus
 from src.infrastructure.auth.jwt_validator import TokenPayload
-from src.presentation.dependencies import get_current_user, get_db, get_notification_service
+from src.presentation.dependencies import (
+    get_current_user,
+    get_db,
+    get_notification_service,
+)
 
 _ADMIN_ROLES = {"Admin", "ADMIN"}
 
@@ -28,7 +38,7 @@ async def create_complaint(
 
 @router.get("", response_model=list[ComplaintResponse])
 async def list_complaints(
-    complaint_status: Optional[ComplaintStatus] = None,
+    complaint_status: ComplaintStatus | None = None,
     db: AsyncSession = Depends(get_db),
     user: TokenPayload = Depends(get_current_user),
 ):

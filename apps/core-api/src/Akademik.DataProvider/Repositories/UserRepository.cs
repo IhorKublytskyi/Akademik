@@ -1,8 +1,7 @@
-﻿using Akademik.DataProvider;
 using Akademik.DataProvider.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Akademik.Services.Users;
+namespace Akademik.DataProvider.Repositories;
 
 public sealed class UserRepository : IUserRepository
 {
@@ -66,7 +65,9 @@ public sealed class UserRepository : IUserRepository
 
     public async ValueTask DeleteAsync(int id, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        await _dbContext.Users
+            .Where(u => u.Id == id)
+            .ExecuteDeleteAsync(cancellationToken);
     }
 
     public async ValueTask UpdateAsync(User user, CancellationToken cancellationToken = default)

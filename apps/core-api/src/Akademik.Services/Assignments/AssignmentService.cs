@@ -1,5 +1,5 @@
-﻿using Akademik.DataProvider.Models;
-using Akademik.Services.Rooms;
+using Akademik.DataProvider.Models;
+using Akademik.DataProvider.Repositories;
 
 namespace Akademik.Services.Assignments;
 
@@ -7,11 +7,13 @@ public sealed class AssignmentService : IAssignmentService
 {
 	private readonly IAssignmentRepository _repository;
 	private readonly IRoomRepository _roomRepository;
+	private readonly IUserRepository _userRepository;
 
-	public AssignmentService(IAssignmentRepository repository, IRoomRepository roomRepository)
+	public AssignmentService(IAssignmentRepository repository, IRoomRepository roomRepository, IUserRepository userRepository)
 	{
 		_repository = repository;
 		_roomRepository = roomRepository;
+		_userRepository = userRepository;
 	}
 
 	public async ValueTask<Assignment> CreateAsync(Assignment assignment, CancellationToken cancellationToken)
@@ -22,6 +24,13 @@ public sealed class AssignmentService : IAssignmentService
 		if (hasActiveAssignment)
 		{
 			throw new InvalidOperationException("User already has an active assignment.");
+		}
+
+		var user = await _userRepository.GetByIdAsync(assignment.UserId, cancellationToken);
+
+		if(user is null || user.Status == UserStatus.Blocked)
+		{
+			throw new InvalidOperationException("Couldn't assign this user to this room.");
 		}
 
 		var room = await _roomRepository.GetByIdAsync(assignment.RoomId, cancellationToken);
@@ -59,5 +68,10 @@ public sealed class AssignmentService : IAssignmentService
 		}
 
 		return await _repository.GetRoommatesByRoomIdAsync(assignment.RoomId, userId, cancellationToken);
+	}
+
+	public async ValueTask DeleteAsync(int id, CancellationToken cancellationToken)
+	{
+		await _repository.DeleteAsync(id, cancellationToken);
 	}
 }

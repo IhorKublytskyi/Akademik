@@ -65,7 +65,11 @@ export default function EditRoomDialog({ room, isOpen, onClose }: EditRoomDialog
     })
 
     const onSubmit = (data: EditRoomFormValues) => {
-        handleUpdate(data as UpdateRoomRequest)
+        handleUpdate({
+            ...data,
+            number: room!.number,
+            floor: room!.floor
+        } as UpdateRoomRequest)
     }
 
     if (!room) return null

@@ -1,4 +1,5 @@
-﻿using Akademik.DataProvider.Models;
+using Akademik.DataProvider.Models;
+using Akademik.DataProvider.Repositories;
 
 namespace Akademik.Services.Users;
 
@@ -48,4 +49,9 @@ public class UserService : IUserService
 		
 		return user;
 	}
+
+    public async ValueTask DeleteAsync(int id, CancellationToken cancellationToken)
+    {
+        await _repository.DeleteAsync(id, cancellationToken);
+    }
 }

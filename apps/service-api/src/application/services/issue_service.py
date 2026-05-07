@@ -1,9 +1,11 @@
-from typing import Optional
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.application.exceptions.exceptions import AccessDenied, IssueAlreadyClosed, IssueNotFound
+from src.application.exceptions.exceptions import (
+    IssueAlreadyClosed,
+    IssueNotFound,
+)
 from src.application.ports.notification_port import NotificationPort
 from src.domain.entities.issue import IssueCreate, IssueStatusUpdate
 from src.domain.enums import IssueStatus
@@ -45,7 +47,7 @@ async def get_issues(
     db: AsyncSession,
     user_id: int,
     role: str,
-    status_filter: Optional[IssueStatus] = None,
+    status_filter: IssueStatus | None = None,
 ) -> list[IssueModel]:
     stmt = select(IssueModel)
 
