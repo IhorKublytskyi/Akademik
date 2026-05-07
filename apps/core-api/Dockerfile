@@ -11,11 +11,11 @@ RUN dotnet restore Akademik.sln
 
 COPY src/ .
 
-RUN dotnet publish Akademik/Akademik.csproj -c Release -o /out --no-restore
+RUN dotnet publish Akademik/Akademik.csproj -c Release -o /out
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0
 WORKDIR /app
 COPY --from=build /out .
 
-EXPOSE 3001
+EXPOSE 8080
 ENTRYPOINT ["dotnet", "Akademik.dll"]

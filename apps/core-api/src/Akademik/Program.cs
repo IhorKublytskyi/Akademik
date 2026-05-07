@@ -3,19 +3,19 @@ using System.Text;
 using Akademik.DataProvider.Models;
 using Akademik.Models;
 using Akademik.Services.Users;
-using Microsoft.AspNetCore.Mvc;
 using Akademik.DataProvider;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.EntityFrameworkCore;
 using Akademik.Services.Assignments;
 using Akademik.Services.Rooms;
 using Akademik.Middleware;
-using FluentValidation;
 using Akademik.Validators;
 using Akademik.DataProvider.Repositories;
 using Akademik.Services.Security;
 using Akademik.Services.Auth;
+using Microsoft.AspNetCore.Mvc; 
+using Microsoft.EntityFrameworkCore; 
+using Microsoft.AspNetCore.Authentication.JwtBearer; 
+using Microsoft.IdentityModel.Tokens; 
+using FluentValidation; 
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -85,10 +85,22 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    var context = scope.ServiceProvider.GetRequiredService<AkademikDbContext>();
-    if (app.Environment.IsDevelopment())
+    var services = scope.ServiceProvider;
+    try
     {
-        await DbInitializer.InitializeAsync(context);
+        var context = services.GetRequiredService<AkademikDbContext>();
+        
+        await context.Database.MigrateAsync(); 
+        
+        if (app.Environment.IsDevelopment())
+        {
+            await DbInitializer.InitializeAsync(context);
+        }
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while migrating or initializing the database.");
     }
 }
 
