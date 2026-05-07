@@ -1,4 +1,4 @@
-﻿namespace Akademik.DataProvider.Models;
+namespace Akademik.DataProvider.Models;
 
 public enum UserStatus
 {

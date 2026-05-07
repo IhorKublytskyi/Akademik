@@ -65,7 +65,7 @@ export default function AssignStudentDialog() {
             reset()
             setOpen(false)
         },
-        onError: () => {
+        onError: (data: any) => {
             toast.error("Failed to assign student")
         }
     })

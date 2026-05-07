@@ -1,4 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -6,6 +6,7 @@ using Akademik.DataProvider.Models;
 using Akademik.Services.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Akademik.DataProvider.Repositories;
 
 namespace Akademik.Services.JwtAuthorization;
 
@@ -37,7 +38,7 @@ public sealed class JwtService : IJwtService
 			new("status", user.Status.ToString())
 		};
 
-		var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+		var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
 		var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
 		var token = new JwtSecurityToken(

@@ -1,4 +1,4 @@
-﻿using Akademik.DataProvider.Configurations;
+using Akademik.DataProvider.Configurations;
 using Akademik.DataProvider.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
@@ -19,6 +19,7 @@ public sealed class AkademikDbContext : DbContext
         modelBuilder.ApplyConfiguration(new UserConfiguration());
         modelBuilder.ApplyConfiguration(new RoomConfiguration());
         modelBuilder.ApplyConfiguration(new AssignmentConfiguration());
+        modelBuilder.ApplyConfiguration(new RefreshTokenConfiguration());
     }
 }
 
@@ -28,7 +29,7 @@ public class DbConextDesignTimeFactory : IDesignTimeDbContextFactory<AkademikDbC
     {
         var optionsBuilder = new DbContextOptionsBuilder<AkademikDbContext>();
         
-        optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=Akademik;Username=postgres;Password=root");
+        optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=Akademik;Username=postgres;Password=arma03042003");
 
         return new AkademikDbContext(optionsBuilder.Options);
     }

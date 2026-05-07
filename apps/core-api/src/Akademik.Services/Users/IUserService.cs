@@ -9,4 +9,5 @@ public interface IUserService
 	ValueTask<User?> GetByEmailAsync(string email, CancellationToken cancellationToken);
 	ValueTask<User?> GetByIdAsync(int id, CancellationToken cancellationToken);
 	ValueTask<User?> UpdateAsync(User user, CancellationToken cancellationToken = default);
+	ValueTask DeleteAsync(int id, CancellationToken cancellationToken);
 }

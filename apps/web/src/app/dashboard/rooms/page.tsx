@@ -1,12 +1,14 @@
 "use client"
 
+import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { getRoomsList } from "@/services/room-service"
 import { Room } from "@/shared/types/room"
 import { Badge } from "@/shared/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/shared/ui/table"
+import { Button } from "@/shared/ui/button"
 import clsx from "clsx"
-import { Building, Users } from "lucide-react"
+import { Building, Users, ChevronLeft, ChevronRight } from "lucide-react"
 
 import RoomActions from "@/features/rooms/ui/room-actions"
 import RoleGuard from "@/shared/ui/role-guard"
@@ -14,14 +16,19 @@ import { useAuthStore } from "@/features/auth/store/useAuthStore"
 
 export default function RoomsPage() {
     const currentUser = useAuthStore(s => s.user)
+    
+    const [page, setPage] = useState(1)
+    const pageSize = 10
 
-    const { data, isLoading, error } = useQuery({
-        queryKey: ["rooms", 1],
-        queryFn: () => getRoomsList(1, 10),
-        enabled: currentUser?.role === "Admin"
+    const { data, isLoading, error, isPlaceholderData } = useQuery({
+        queryKey: ["rooms", page], 
+        queryFn: () => getRoomsList(page, pageSize),
+        enabled: currentUser?.role === "Admin",
+        placeholderData: (previousData) => previousData,
     })
 
     const rooms = data?.items || []
+    const totalPages = Math.ceil((data?.count || 0) / pageSize)
 
     return (
         <RoleGuard allowedRoles={["Admin"]}>
@@ -56,9 +63,6 @@ export default function RoomsPage() {
                                             <div className="flex flex-col items-center justify-center gap-1 py-10">
                                                 <Building className="h-8 w-8 text-muted-foreground mb-2" />
                                                 <p className="text-sm font-medium">No rooms found</p>
-                                                <p className="text-sm text-muted-foreground">
-                                                    Add your first room to the dormitory.
-                                                </p>
                                             </div>
                                         </TableCell>
                                     </TableRow>
@@ -79,7 +83,6 @@ export default function RoomsPage() {
                                                         room.status === "Available" && "bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300 border-green-700",
                                                         room.status === "Occupied" && "bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300 border-blue-700",
                                                         room.status === "Maintenance" && "bg-orange-50 text-orange-700 dark:bg-orange-950 dark:text-orange-300 border-orange-700",
-                                                        !["Available", "Occupied", "Closed"].includes(room.status as string) && "bg-secondary"
                                                     )}
                                                     variant="outline"
                                                 >
@@ -94,6 +97,32 @@ export default function RoomsPage() {
                                 )}
                             </TableBody>
                         </Table>
+                    </div>
+
+                    <div className="flex items-center justify-between px-2">
+                        <div className="text-sm text-muted-foreground">
+                            Page <strong>{page}</strong> of <strong>{totalPages}</strong>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setPage((old) => Math.max(old - 1, 1))}
+                                disabled={page === 1}
+                            >
+                                <ChevronLeft className="h-4 w-4 mr-1" />
+                                Previous
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setPage((old) => old + 1)}
+                                disabled={page >= totalPages || isPlaceholderData}
+                            >
+                                Next
+                                <ChevronRight className="h-4 w-4 ml-1" />
+                            </Button>
+                        </div>
                     </div>
                 </div>
             )}

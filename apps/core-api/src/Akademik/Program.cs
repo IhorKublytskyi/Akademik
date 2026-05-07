@@ -13,15 +13,23 @@ using Akademik.Services.Rooms;
 using Akademik.Middleware;
 using FluentValidation;
 using Akademik.Validators;
+using Akademik.DataProvider.Repositories;
+using Akademik.Services.Security;
+using Akademik.Services.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateAssignmentRequestValidator>();
+
 
 builder.Services.AddDbContext<AkademikDbContext>(options =>
 {
     options.UseNpgsql(builder.Configuration.GetConnectionString("AkademikConnectionString"));
 });
+
+builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
@@ -102,45 +110,46 @@ app.UseAuthorization();
 
 app.MapPost("/api/core/auth/login", async (
     [FromBody] LoginRequest request,
-    IUserService userService,
-    IJwtService jwtService,
+    IAuthService authService,
     CancellationToken cancellationToken) =>
 {
-    var user = await userService.GetByEmailAsync(request.Email, cancellationToken);
-    if (user is null || BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash) is false)
+    try 
+    {
+        var (user, tokens) = await authService.LoginAsync(request.Email, request.Password, cancellationToken);
+        return Results.Ok(new LoginResponse { User = UserModel.FromUser(user), Token = tokens });
+    }
+    catch (UnauthorizedAccessException)
     {
         return Results.BadRequest("Invalid email or password");
     }
-    if (user.Status == UserStatus.Blocked) return Results.Forbid();
-    var tokens = await jwtService.GenerateTokensAsync(user, cancellationToken);
-    return Results.Ok(new LoginResponse { User = UserModel.FromUser(user), Token = tokens });
 });
 
 app.MapPost("/api/core/auth/register", async (
     [FromBody] RegisterRequest request,
-    IUserService userService,
+    IAuthService authService,
     IValidator<RegisterRequest> validator,
     CancellationToken cancellationToken) =>
 {
     var validationResult = await validator.ValidateAsync(request, cancellationToken);
     if (!validationResult.IsValid) return Results.ValidationProblem(validationResult.ToDictionary());
 
-    var existingUser = await userService.GetByEmailAsync(request.Email, cancellationToken);
-    if (existingUser is not null) return Results.BadRequest("User already exists");
-
-    User newUser = new()
+    try 
     {
-        Email = request.Email,
-        FirstName = request.FirstName,
-        LastName = request.LastName,
-        Role = Enum.Parse<UserRole>(request.Role),
-        PhoneNumber = request.PhoneNumber,
-        Status = UserStatus.Active,
-        PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
-        CreatedAt = DateTime.UtcNow
-    };
-    await userService.CreateAsync(newUser, cancellationToken);
-    return Results.Ok(UserModel.FromUser(newUser));
+        User newUser = new()
+        {
+            Email = request.Email,
+            FirstName = request.FirstName,
+            LastName = request.LastName,
+            Role = Enum.Parse<UserRole>(request.Role),
+            PhoneNumber = request.PhoneNumber,
+        };
+        var registeredUser = await authService.RegisterAsync(newUser, request.Password, cancellationToken);
+        return Results.Ok(UserModel.FromUser(registeredUser));
+    }
+    catch (InvalidOperationException ex)
+    {
+        return Results.BadRequest(ex.Message);
+    }
 }).RequireAuthorization("AdminOnly");
 
 app.MapPost("/api/core/auth/refresh", async (
@@ -210,7 +219,7 @@ app.MapPost("/api/core/assignments-add", async (
     CancellationToken cancellationToken) =>
 {
     var validationResult = await validator.ValidateAsync(request, cancellationToken);
-    if (!validationResult.IsValid) return Results.ValidationProblem(validationResult.ToDictionary());
+    if (validationResult.IsValid is false) return Results.ValidationProblem(validationResult.ToDictionary());
 
     var assignment = new Assignment()
     {
@@ -221,6 +230,22 @@ app.MapPost("/api/core/assignments-add", async (
     };
     await service.CreateAsync(assignment, cancellationToken);
     return Results.Ok(assignment);
+}).RequireAuthorization("AdminOnly");
+
+app.MapDelete("/api/core/assignments/{id:int}", async (
+    int id,
+    IAssignmentService service,
+    CancellationToken cancellationToken) =>
+{
+    if(id <= 0)
+    {   
+        return Results.BadRequest("Invalid id.");
+    }
+
+    await service.DeleteAsync(id, cancellationToken);
+
+    return Results.Ok();
+
 }).RequireAuthorization("AdminOnly");
 
 app.MapGet("/api/core/assignments/roommates", async (
@@ -254,7 +279,22 @@ app.MapPost("/api/core/users-edit", async (
 {
     var user = new User { Id = request.Id, FirstName = request.FirstName, LastName = request.LastName, PhoneNumber = request.PhoneNumber, Email = request.Email, Status = Enum.Parse<UserStatus>(request.Status) };
     var updatedUser = await service.UpdateAsync(user, cancellationToken);
-    return Results.Ok(UserModel.FromUser(updatedUser));
+    return updatedUser is null ? Results.NotFound() : Results.Ok(UserModel.FromUser(updatedUser));
+}).RequireAuthorization("AdminOnly");
+
+app.MapDelete("/api/core/users/{id:int}", async (
+    [FromRoute]int id,
+    IUserService service,
+    CancellationToken cancellationToken) =>
+{
+    if(id <= 0)
+    {
+        return Results.BadRequest("Invalid id.");
+    }
+
+    await service.DeleteAsync(id, cancellationToken);
+
+    return Results.Ok();
 }).RequireAuthorization("AdminOnly");
 
 app.MapGet("/api/core/me", async (

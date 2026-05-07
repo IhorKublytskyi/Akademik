@@ -10,9 +10,7 @@ export interface Room {
 
 export interface RoomsListResponse {
     items: Room[];
-    totalCount: number;
-    page: number;
-    pageSize: number;
+    count: number;
 }
 
 export interface UpdateRoomRequest {
