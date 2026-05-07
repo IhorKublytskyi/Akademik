@@ -5,7 +5,7 @@ import { Assignment } from "@/shared/types/assignment"
 
 import { Button } from "@/shared/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/shared/ui/dropdown-menu"
-import { MoreHorizontal, LogOut, AlertCircle } from "lucide-react"
+import { MoreHorizontal, LogOut } from "lucide-react"
 
 interface AssignmentActionsProps {
     assignment: Assignment
