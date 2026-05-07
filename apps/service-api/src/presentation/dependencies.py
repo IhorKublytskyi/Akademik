@@ -6,7 +6,9 @@ from jwt.exceptions import InvalidTokenError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.ports.notification_port import NotificationPort
-from src.application.services.rabbitmq_notification_service import RabbitMQNotificationService
+from src.application.services.rabbitmq_notification_service import (
+    RabbitMQNotificationService,
+)
 from src.infrastructure.auth.jwt_validator import TokenPayload, decode_token
 from src.infrastructure.database.connection import db
 

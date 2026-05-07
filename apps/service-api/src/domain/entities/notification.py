@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel
 
@@ -11,10 +10,10 @@ class NotificationResponse(BaseModel):
     user_id: int
     channel: NotificationChannel
     title: str
-    content: Optional[str]
+    content: str | None
     status: NotificationStatus
-    scheduled_at: Optional[datetime]
-    sent_at: Optional[datetime]
+    scheduled_at: datetime | None
+    sent_at: datetime | None
 
     class Config:
         from_attributes = True

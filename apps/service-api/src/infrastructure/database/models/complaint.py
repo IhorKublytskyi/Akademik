@@ -3,8 +3,8 @@ import enum
 from sqlalchemy import Boolean, Column, DateTime, Integer, String
 from sqlalchemy import Enum as SQLEnum
 
-from src.infrastructure.utils.datetime_utils import utc_now_naive
 from src.infrastructure.database.connection import Base
+from src.infrastructure.utils.datetime_utils import utc_now_naive
 
 
 class ComplaintStatus(str, enum.Enum):
