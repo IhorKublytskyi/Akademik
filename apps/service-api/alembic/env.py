@@ -6,8 +6,9 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
-from src.infrastructure.database.models.base import Base
-from src.infrastructure.settings import get_settings
+from src.infrastructure.database.models import issue, complaint, notification, event, qr  # noqa: F401
+from src.infrastructure.database.connection import Base
+from src.infrastructure.config import settings
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -23,7 +24,6 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 target_metadata = Base.metadata
-settings = get_settings()
 config.set_main_option("sqlalchemy.url", settings.database_url)
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

@@ -29,6 +29,17 @@ services:
   # core-api:
   #   build: ./apps/core-api
 
+  migrate:
+    build: ./apps/service-api
+    command: alembic upgrade head
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+    depends_on:
+      - postgres
+    networks:
+      - internal
+    restart: "no"
+
   service-api:
     build: ./apps/service-api
     ports:
@@ -40,7 +51,7 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       PORT: 3002
     depends_on:
-      - postgres
+      - migrate
       - rabbitmq
     networks:
       - internal
