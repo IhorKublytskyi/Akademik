@@ -15,5 +15,9 @@ class Settings(BaseSettings):
     jwt_secret: str = os.getenv("JWT_SECRET", "supersecretkey")
     jwt_algorithm: str = "HS256"
 
+    # Must match Jwt:Issuer and Jwt:Audience in core-api appsettings.json
+    jwt_issuer: str = os.getenv("JWT_ISSUER", "akademik")
+    jwt_audience: str = os.getenv("JWT_AUDIENCE", "akademik")
+
 
 settings = Settings()
