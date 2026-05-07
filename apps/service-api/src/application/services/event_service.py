@@ -30,8 +30,8 @@ async def create_event(
         user_id=user_id,
         title=data.title,
         description=data.description,
-        start_at=data.start_at,
-        end_at=data.end_at,
+        start_at=data.start_at.replace(tzinfo=None),
+        end_at=data.end_at.replace(tzinfo=None),
         source=EventSource.USER,
         type=data.type,
     )
@@ -59,9 +59,9 @@ async def update_event(
     if data.description is not None:
         event.description = data.description
     if data.start_at is not None:
-        event.start_at = data.start_at
+        event.start_at = data.start_at.replace(tzinfo=None)
     if data.end_at is not None:
-        event.end_at = data.end_at
+        event.end_at = data.end_at.replace(tzinfo=None)
 
     await db.commit()
     await db.refresh(event)
@@ -95,8 +95,8 @@ async def create_room_inspections(
             user_id=uid,
             title=data.title,
             description=data.description,
-            start_at=data.start_at,
-            end_at=data.end_at,
+            start_at=data.start_at.replace(tzinfo=None),
+            end_at=data.end_at.replace(tzinfo=None),
             source=EventSource.ADMIN,
             type=EventType.ROOM_INSPECTION,
         )

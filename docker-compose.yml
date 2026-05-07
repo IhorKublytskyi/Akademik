@@ -68,6 +68,8 @@ services:
       RABBITMQ_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASS}@rabbitmq:5672
       JWT_SECRET: ${JWT_SECRET}
       PORT: 3002
+    volumes:
+      - ./apps/service-api/alembic:/app/alembic
     depends_on:
       - migrate
       - rabbitmq
