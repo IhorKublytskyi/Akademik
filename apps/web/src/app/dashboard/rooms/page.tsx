@@ -16,12 +16,12 @@ import { useAuthStore } from "@/features/auth/store/useAuthStore"
 
 export default function RoomsPage() {
     const currentUser = useAuthStore(s => s.user)
-    
+
     const [page, setPage] = useState(1)
     const pageSize = 10
 
     const { data, isLoading, error, isPlaceholderData } = useQuery({
-        queryKey: ["rooms", page], 
+        queryKey: ["rooms", page],
         queryFn: () => getRoomsList(page, pageSize),
         enabled: currentUser?.role === "Admin",
         placeholderData: (previousData) => previousData,
@@ -29,6 +29,8 @@ export default function RoomsPage() {
 
     const rooms = data?.items || []
     const totalPages = Math.ceil((data?.count || 0) / pageSize)
+
+    console.log(rooms)
 
     return (
         <RoleGuard allowedRoles={["Admin"]}>
@@ -80,13 +82,17 @@ export default function RoomsPage() {
                                             <TableCell>
                                                 <Badge
                                                     className={clsx(
-                                                        room.status === "Available" && "bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300 border-green-700",
-                                                        room.status === "Occupied" && "bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300 border-blue-700",
-                                                        room.status === "Maintenance" && "bg-orange-50 text-orange-700 dark:bg-orange-950 dark:text-orange-300 border-orange-700",
+                                                        room.status === 0 && "bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300 border-green-700",
+                                                        room.status === 1 && "bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300 border-blue-700",
+                                                        room.status === 2 && "bg-orange-50 text-orange-700 dark:bg-orange-950 dark:text-orange-300 border-orange-700",
                                                     )}
                                                     variant="outline"
                                                 >
-                                                    {room.status}
+                                                    {
+                                                        room.status === 0 ? "Available" :
+                                                        room.status === 1 ? "Occupied" :
+                                                        "Closed"
+                                                    }
                                                 </Badge>
                                             </TableCell>
                                             <TableCell>

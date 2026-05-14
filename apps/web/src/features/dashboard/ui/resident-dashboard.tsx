@@ -9,6 +9,8 @@ export default function ResidentDashboard() {
         queryFn: getRoommates
     })
 
+    console.log(roommates)
+
     return (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <Card className="md:col-span-2 lg:col-span-2">

@@ -24,6 +24,9 @@ public sealed class AssignmentRepository : IAssignmentRepository
         int count = await query.CountAsync(cancellationToken);
 
         List<Assignment> assignments = await query
+        .Include(a => a.User)
+            .Include(a => a.Room)
+            .OrderByDescending(a => a.StartDate)
             .Skip(pagination.Skip)
             .Take(pagination.PageSize)
             .Select(a => new Assignment
@@ -34,6 +37,8 @@ public sealed class AssignmentRepository : IAssignmentRepository
                 StartDate = a.StartDate,
                 EndDate = a.EndDate,
                 IsActive = a.IsActive,
+                User = a.User,
+                Room = a.Room
             })
             .ToListAsync(cancellationToken);
 

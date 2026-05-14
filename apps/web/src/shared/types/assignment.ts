@@ -1,3 +1,6 @@
+import { Room } from "./room"
+import { User } from "./user"
+
 export interface PaginationParams {
     pageNumber: number;
     pageSize: number;
@@ -15,6 +18,8 @@ export interface Assignment {
     startDate: string;
     endDate?: string | null;
     isActive: boolean;
+    user: User;
+    room: Room;
 }
 
 export interface CreateAssignmentRequest {

@@ -3,7 +3,7 @@ import axios from "axios"
 import Cookies from "js-cookie"
 
 export const api = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5202",
+    baseURL: "http://localhost",
     headers: {
         "Content-Type": "application/json",
     }
@@ -27,7 +27,7 @@ api.interceptors.response.use(
 
             try {
                 const refreshResponse = await axios.post(
-                    `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5202'}/api/core/auth/refresh`,
+                    `http://localhost/api/core/auth/refresh`,
                     {
                         refreshToken: Cookies.get("refresh_token")
                     },

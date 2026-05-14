@@ -33,26 +33,6 @@ export default function LoginForm() {
             const { user, token } = response.data
             setAuth(user, token.accessToken, token.refreshToken)
 
-            console.log(user);
-
-            // const fakeUser = {
-            //     id: "1",
-            //     firstName: "Anton",
-            //     lastName: "Hry",
-            //     email: "grutoha@gmail.com",
-            //     phoneNumber: "795029892",
-            //     role: "admin" as "admin",
-            //     status: "active" as "active",
-            //     createdAt: 12312312
-            // }
-
-            // const fakeToken = {
-            //     accessToken: "super_secret_access_token",
-            //     refreshToken: "super_secret_refresh_token"
-            // }
-
-            // setAuth(fakeUser, fakeToken.accessToken, fakeToken.refreshToken)
-
             toast.success("Login successful! Welcome to Akademik")
             router.push("/dashboard")
         } catch (error: any) {

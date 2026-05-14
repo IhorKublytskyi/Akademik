@@ -12,7 +12,7 @@ public sealed class AkademikDbContext : DbContext
     public DbSet<Room> Rooms { get; set; }
     public DbSet<Assignment> Assignments { get; set; }
 
-    public AkademikDbContext(DbContextOptions<AkademikDbContext> options) : base(options) {}
+    public AkademikDbContext(DbContextOptions<AkademikDbContext> options) : base(options) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -28,8 +28,8 @@ public class DbConextDesignTimeFactory : IDesignTimeDbContextFactory<AkademikDbC
     public AkademikDbContext CreateDbContext(string[] args)
     {
         var optionsBuilder = new DbContextOptionsBuilder<AkademikDbContext>();
-        
-        optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=Akademik;Username=postgres;Password=arma03042003");
+
+        optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=Akademik;Username=postgres;Password=root");
 
         return new AkademikDbContext(optionsBuilder.Options);
     }

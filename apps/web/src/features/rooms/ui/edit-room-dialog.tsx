@@ -19,7 +19,7 @@ import { toast } from "sonner"
 const editRoomSchema = z.object({
     id: z.number(),
     capacity: z.number().min(1, "Capacity must be at least 1").max(10, "Capacity cannot exceed 10"),
-    status: z.enum(["Available", "Occupied", "Maintenance"]),
+    status: z.enum(["Available", "Occupied", "Closed"]),
 })
 
 type EditRoomFormValues = z.infer<typeof editRoomSchema>
@@ -44,10 +44,14 @@ export default function EditRoomDialog({ room, isOpen, onClose }: EditRoomDialog
 
     useEffect(() => {
         if (room && isOpen) {
+            const roomStatus =
+                room.status === 0 ? "Available" :
+                    room.status === 1 ? "Occupied" :
+                        "Closed"
             reset({
                 id: room.id,
                 capacity: room.capacity,
-                status: room.status as "Available" | "Occupied" | "Maintenance",
+                status: roomStatus,
             })
         }
     }, [room, isOpen, reset])
@@ -65,10 +69,18 @@ export default function EditRoomDialog({ room, isOpen, onClose }: EditRoomDialog
     })
 
     const onSubmit = (data: EditRoomFormValues) => {
+        const statusMap = {
+            "Available": 0,
+            "Occupied": 1,
+            "Closed": 2
+        }
+
         handleUpdate({
-            ...data,
+            id: data.id,
             number: room!.number,
-            floor: room!.floor
+            floor: room!.floor,
+            capacity: data.capacity,
+            status: statusMap[data.status],
         } as UpdateRoomRequest)
     }
 
@@ -132,7 +144,7 @@ export default function EditRoomDialog({ room, isOpen, onClose }: EditRoomDialog
                                             <SelectContent>
                                                 <SelectItem value="Available">Available</SelectItem>
                                                 <SelectItem value="Occupied">Occupied</SelectItem>
-                                                <SelectItem value="Maintenance">Maintenance</SelectItem>
+                                                <SelectItem value="Closed">Closed</SelectItem>
                                             </SelectContent>
                                         </Select>
                                     </Field>

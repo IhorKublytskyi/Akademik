@@ -19,9 +19,10 @@ public class RoomRepository : IRoomRepository
         int count = await query.CountAsync(cancellationToken);
 
         List<Room> rooms = await query
+            .Include(r => r.Assignment)
+            .OrderBy(r => r.Id)
             .Skip(pagination.Skip)
             .Take(pagination.PageSize)
-            .Include(r => r.Assignment)
             .Select(r => new Room
             {
                 Id = r.Id,
@@ -30,7 +31,6 @@ public class RoomRepository : IRoomRepository
                 Number = r.Number,
                 Status = r.Status,
             })
-            .OrderBy(r => r.Number)
             .ToListAsync(cancellationToken);
 
         return new PagedResult<Room>()

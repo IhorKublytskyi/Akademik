@@ -132,11 +132,17 @@ export default function AssignStudentDialog() {
                                             <SelectValue placeholder={isLoadingRooms ? "Loading..." : "Select room"} />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {roomsData?.items?.map(room => (
-                                                <SelectItem key={room.id} value={room.id.toString()}>
-                                                    Room {room.number} (Floor {room.floor}) - {room.status}
-                                                </SelectItem>
-                                            ))}
+                                            {roomsData?.items?.filter(r => r.status === 0).map(room => {
+                                                const roomStatus =
+                                                    room.status === 0 ? "Available" :
+                                                        room.status === 1 ? "Occupied" :
+                                                            "Closed"
+                                                return (
+                                                    <SelectItem key={room.id} value={room.id.toString()}>
+                                                        Room {room.number} (Floor {room.floor}) - {roomStatus}
+                                                    </SelectItem>
+                                                )
+                                            })}
                                         </SelectContent>
                                     </Select>
                                 </Field>
