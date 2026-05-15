@@ -66,3 +66,8 @@ section-order = ["future", "standard-library", "third-party", "first-party", "lo
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
