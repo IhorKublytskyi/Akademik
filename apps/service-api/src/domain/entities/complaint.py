@@ -4,6 +4,13 @@ from pydantic import BaseModel
 
 from src.domain.enums import ComplaintStatus
 
+class UserNestedResponse(BaseModel):
+    first_name: str
+    last_name: str
+    email: str
+
+    class Config:
+        from_attributes = True
 
 class ComplaintCreate(BaseModel):
     room_id: int | None = None
@@ -20,6 +27,7 @@ class ComplaintResponse(BaseModel):
     status: ComplaintStatus
     created_at: datetime
     closed_at: datetime | None
+    user: UserNestedResponse | None = None
 
     class Config:
         from_attributes = True

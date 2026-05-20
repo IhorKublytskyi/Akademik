@@ -1,6 +1,7 @@
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
 from src.application.exceptions.exceptions import (
     ComplaintAlreadyClosed,
@@ -49,7 +50,7 @@ async def get_complaints(
     role: str,
     status_filter: ComplaintStatus | None = None,
 ) -> list[ComplaintModel]:
-    stmt = select(ComplaintModel)
+    stmt = select(ComplaintModel).options(joinedload(ComplaintModel.user))
 
     if role not in _ADMIN_ROLES:
         stmt = stmt.where(ComplaintModel.user_id == user_id)
@@ -68,7 +69,7 @@ async def update_complaint_status(
     data: ComplaintStatusUpdate,
     notifier: NotificationPort,
 ) -> ComplaintModel:
-    complaint = await db.get(ComplaintModel, complaint_id)
+    complaint = await db.get(ComplaintModel, complaint_id, options=[joinedload(ComplaintModel.user)])
     if complaint is None:
         raise ComplaintNotFound(f"Complaint {complaint_id} not found")
 
