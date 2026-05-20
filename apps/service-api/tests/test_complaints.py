@@ -2,7 +2,10 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.exceptions.exceptions import ComplaintAlreadyClosed
-from src.application.services.complaint_service import create_complaint, update_complaint_status
+from src.application.services.complaint_service import (
+    create_complaint,
+    update_complaint_status,
+)
 from src.domain.entities.complaint import ComplaintCreate, ComplaintStatusUpdate
 from src.domain.enums import ComplaintStatus
 from src.infrastructure.database.models.complaint import ComplaintModel

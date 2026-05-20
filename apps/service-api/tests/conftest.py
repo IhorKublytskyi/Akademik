@@ -2,15 +2,21 @@ import os
 
 import pytest
 import pytest_asyncio
-import src.infrastructure.database.connection as _db_module
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import NullPool
 
+import src.infrastructure.database.connection as _db_module
 from src.application.ports.notification_port import NotificationPort
 from src.domain.enums import NotificationChannel
 from src.infrastructure.database.connection import Base
-from src.infrastructure.database.models import complaint, event, issue, notification, qr  # noqa: F401
+from src.infrastructure.database.models import (  # noqa: F401
+    complaint,
+    event,
+    issue,
+    notification,
+    qr,
+)
 
 TEST_DB_URL = os.getenv(
     "DATABASE_URL",

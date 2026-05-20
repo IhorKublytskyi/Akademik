@@ -6,9 +6,15 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
-from src.infrastructure.database.models import issue, complaint, notification, event, qr  # noqa: F401
-from src.infrastructure.database.connection import Base
 from src.infrastructure.config import settings
+from src.infrastructure.database.connection import Base
+from src.infrastructure.database.models import (  # noqa: F401
+    complaint,
+    event,
+    issue,
+    notification,
+    qr,
+)
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
