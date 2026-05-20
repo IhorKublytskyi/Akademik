@@ -1,7 +1,7 @@
 """create_python_tables
 
 Revision ID: 4be055d37b5d
-Revises: 
+Revises:
 Create Date: 2026-05-07 16:59:46.438165
 
 """
