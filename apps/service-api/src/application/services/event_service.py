@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import select, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.exceptions.exceptions import EventAccessDenied, EventNotFound
@@ -7,16 +7,22 @@ from src.domain.entities.event import EventCreate, EventUpdate, RoomInspectionCr
 from src.domain.enums import EventSource, EventType
 from src.infrastructure.database.models.event import EventModel
 
+_ADMIN_ROLES = {"Admin", "ADMIN"}
 
 async def get_user_events(
     db: AsyncSession,
     user_id: int,
+    role: str,
 ) -> list[EventModel]:
-    stmt = (
-        select(EventModel)
-        .where(EventModel.user_id == user_id)
-        .order_by(EventModel.start_at.asc())
-    )
+    if role in _ADMIN_ROLES:
+        stmt = (
+            select(EventModel)
+            .where(or_(EventModel.user_id == user_id, EventModel.source == EventSource.ADMIN))
+        )
+    else:
+        stmt = select(EventModel).where(EventModel.user_id == user_id)
+        
+    stmt = stmt.order_by(EventModel.start_at.asc())
     result = await db.execute(stmt)
     return list(result.scalars().all())
 
