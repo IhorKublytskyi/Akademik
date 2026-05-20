@@ -1,6 +1,6 @@
 import enum
 
-from sqlalchemy import Boolean, Column, DateTime, Integer, String, ForeignKey
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.orm import relationship
 
@@ -33,7 +33,7 @@ class ComplaintModel(Base):
     status = Column(SQLEnum(ComplaintStatus), default=ComplaintStatus.NEW, nullable=False)
     created_at = Column(DateTime, default=utc_now_naive, nullable=False)
     closed_at = Column(DateTime, nullable=True)
-    
+
     user = relationship("UserModel")
 
     def __repr__(self):

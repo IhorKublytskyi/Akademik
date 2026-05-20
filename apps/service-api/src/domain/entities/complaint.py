@@ -4,6 +4,7 @@ from pydantic import BaseModel
 
 from src.domain.enums import ComplaintStatus
 
+
 class UserNestedResponse(BaseModel):
     first_name: str
     last_name: str

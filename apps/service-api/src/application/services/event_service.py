@@ -1,4 +1,4 @@
-from sqlalchemy import select, or_
+from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.exceptions.exceptions import EventAccessDenied, EventNotFound
@@ -21,7 +21,7 @@ async def get_user_events(
         )
     else:
         stmt = select(EventModel).where(EventModel.user_id == user_id)
-        
+
     stmt = stmt.order_by(EventModel.start_at.asc())
     result = await db.execute(stmt)
     return list(result.scalars().all())

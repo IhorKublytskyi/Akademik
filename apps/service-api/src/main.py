@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-
 from fastapi.middleware.cors import CORSMiddleware
+
 from src.presentation.api.health_router import router as health_router
 from src.presentation.api.v1 import me_router
 from src.presentation.api.v1.complaints_router import router as complaints_router
