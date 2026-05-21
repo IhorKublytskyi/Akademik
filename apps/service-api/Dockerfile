@@ -1,11 +1,21 @@
-FROM python:3.12-slim
+FROM python:3.12-slim AS builder
 
-RUN pip install poetry
+RUN pip install poetry poetry-plugin-export
 
 WORKDIR /app
 
 COPY pyproject.toml poetry.lock* ./
-RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-root
+
+RUN poetry export --only main --without-hashes -f requirements.txt -o requirements.txt
+
+
+FROM python:3.12-slim
+
+WORKDIR /app
+
+COPY --from=builder /app/requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
