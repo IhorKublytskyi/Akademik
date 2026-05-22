@@ -198,12 +198,8 @@ docker-compose.yml
 
 ## Zrzuty ekranu
 
-*(dodać po ukończeniu UI)*
-
-```
 ![login](docs/screenshots/login.jpg)
 ![dashboard](docs/screenshots/dashboard.jpg)
-```
 
 ## Status projektu
 
