@@ -27,3 +27,8 @@ export interface CreateAssignmentRequest {
     roomId: number;
     startDate: string | Date;
 }
+
+export interface Roommates {
+    roomNumber: number;
+    roommatesArray: User[];
+}

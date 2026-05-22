@@ -9,6 +9,8 @@ export default function ResidentDashboard() {
         queryFn: getRoommates
     })
 
+    console.log(roommates)
+
     return (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <Card className="md:col-span-2 lg:col-span-2">
@@ -19,11 +21,11 @@ export default function ResidentDashboard() {
                 <CardContent>
                     {isLoading ? (
                         <p className="text-sm text-muted-foreground mt-4">Loading room data...</p>
-                    ) : roommates && roommates.length > 0 ? (
+                    ) : roommates && roommates.roommatesArray.length > 0 ? (
                         <div className="mt-4 space-y-4">
                             <p className="text-sm font-medium">People living with you:</p>
                             <div className="grid gap-4 sm:grid-cols-2">
-                                {roommates.map((mate) => (
+                                {roommates.roommatesArray.map((mate) => (
                                     <div key={mate.id} className="flex items-center space-x-4 rounded-md border p-3">
                                         <div className="flex-1 space-y-1">
                                             <p className="text-sm font-medium leading-none">
