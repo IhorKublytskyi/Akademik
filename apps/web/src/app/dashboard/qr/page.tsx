@@ -48,8 +48,8 @@ export default function ResidentQrPage() {
 
     useEffect(() => {
         if (!isLoading && !activeQr && !isGenerating && !hasAttempted) {
-            setHasAttempted(true)
             generateNewQr()
+            setHasAttempted(true)
         }
     }, [isLoading, activeQr, isGenerating, hasAttempted, generateNewQr])
 
