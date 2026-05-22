@@ -38,9 +38,9 @@ Posiada panel administracyjny do zarządzania użytkownikami, zgłoszeniami i do
 
 ## Autorzy
 
-- *(uzupełnić — imię nazwisko – rola)*
-- *(uzupełnić — imię nazwisko – rola)*
-- *(uzupełnić — imię nazwisko – rola)*
+- Katsiaryna Kozhych - service-api
+- Ihor Kublytskyi - core-api
+- Anton Hryshchuk - web
 
 ## Technologie
 
