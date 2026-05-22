@@ -57,17 +57,23 @@ public sealed class AssignmentService : IAssignmentService
 		return await _repository.GetAllAsync(pagination, cancellationToken);
 	}
 
-	public async ValueTask<List<User>> GetRoommatesAsync(int userId, CancellationToken cancellationToken)
+	public async ValueTask<Roommates> GetRoommatesAsync(int userId, CancellationToken cancellationToken)
 	{
 		cancellationToken.ThrowIfCancellationRequested();
 
 		var assignment = await _repository.GetActiveAssignmentByUserIdAsync(userId, cancellationToken);
 		if (assignment == null)
 		{
-			return new List<User>();
+			return new Roommates();
 		}
 
-		return await _repository.GetRoommatesByRoomIdAsync(assignment.RoomId, userId, cancellationToken);
+		List<Assignment?> assignments = await _repository.GetRoommatesByRoomIdAsync(assignment.RoomId, userId, cancellationToken);
+
+		return new Roommates()
+		{
+			RoomNumber = assignment.RoomId,
+			Assignments = assignments
+        };
 	}
 
 	public async ValueTask DeleteAsync(int id, CancellationToken cancellationToken)
