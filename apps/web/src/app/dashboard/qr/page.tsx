@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useAuthStore } from "@/features/auth/store/useAuthStore"
 import { getQRCodes, createQRCode } from "@/services/qr-service"
@@ -12,7 +12,7 @@ import { RefreshCw, ShieldCheck } from "lucide-react"
 import QRCodeSVG from "react-qr-code"
 
 export default function ResidentQrPage() {
-    const [hasAttempted, setHasAttempted] = useState(false)
+    const hasAttempted = useRef(false)
     const queryClient = useQueryClient()
     const currentUser = useAuthStore((state) => state.user)
     const [timeLeft, setTimeLeft] = useState<string>("")
@@ -47,11 +47,11 @@ export default function ResidentQrPage() {
     })
 
     useEffect(() => {
-        if (!isLoading && !activeQr && !isGenerating && !hasAttempted) {
+        if (!isLoading && !activeQr && !isGenerating && !hasAttempted.current) {
+            hasAttempted.current = true
             generateNewQr()
-            setHasAttempted(true)
         }
-    }, [isLoading, activeQr, isGenerating, hasAttempted, generateNewQr])
+    }, [isLoading, activeQr, isGenerating, generateNewQr])
 
     useEffect(() => {
         if (!activeQr) return

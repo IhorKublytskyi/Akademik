@@ -6,13 +6,13 @@ import { toast } from "sonner"
 import { format } from "date-fns"
 
 import { createEvent, updateEvent, deleteEvent } from "@/services/event-service"
-import { getUsersList } from "@/services/user-service" // Імпортуємо сервіс користувачів
+import { getUsersList } from "@/services/user-service"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/shared/ui/dialog"
 import { Button } from "@/shared/ui/button"
 import { Input } from "@/shared/ui/input"
 import { Textarea } from "@/shared/ui/textarea"
 import { FieldGroup, FieldLabel } from "@/shared/ui/field"
-import { AppEvent } from "@/shared/types/events"
+import { AppEvent, EventType } from "@/shared/types/events"
 
 interface Props {
     open: boolean
@@ -46,6 +46,7 @@ export default function EventDetailsDialog({ open, onOpenChange, selectedEvent, 
         if (!open) return
         
         if (selectedEvent) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setFormData({
                 title: selectedEvent.title,
                 description: selectedEvent.description || "",
@@ -53,6 +54,7 @@ export default function EventDetailsDialog({ open, onOpenChange, selectedEvent, 
                 endAt: format(new Date(selectedEvent.end_at + "Z"), "yyyy-MM-dd'T'HH:mm")
             })
         } else if (selectedSlot) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setFormData({
                 title: "", description: "",
                 startAt: format(selectedSlot.start, "yyyy-MM-dd'T'HH:mm"),
@@ -62,7 +64,7 @@ export default function EventDetailsDialog({ open, onOpenChange, selectedEvent, 
     }, [selectedEvent, selectedSlot, open])
 
     const { mutate: saveEvent, isPending } = useMutation({
-        mutationFn: (data: { title: string; description: string; start_at: string; end_at: string; type: string }) => selectedEvent ? updateEvent(selectedEvent.id, data) : createEvent(data),
+        mutationFn: (data: { title: string; description: string; start_at: string; end_at: string; type: EventType }) => selectedEvent ? updateEvent(selectedEvent.id, data) : createEvent(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["events"] })
             toast.success(selectedEvent ? "Event updated" : "Event created")

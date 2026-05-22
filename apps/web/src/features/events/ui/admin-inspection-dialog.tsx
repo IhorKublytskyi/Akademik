@@ -33,7 +33,7 @@ export default function AdminInspectionDialog() {
     const residents = users.filter((u: { role: string }) => u.role !== "Admin" && u.role !== "ADMIN")
 
     const { mutate, isPending } = useMutation({
-        mutationFn: (data: { title: string; description: string; start_at: string; end_at: string; resident_ids: number[] }) => createRoomInspection(data),
+        mutationFn: (data: { title: string; description: string; start_at: string; end_at: string; user_ids: number[] }) => createRoomInspection(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["events"] })
             toast.success("Inspections scheduled successfully")
@@ -96,7 +96,7 @@ export default function AdminInspectionDialog() {
                                     </div>
                                 ) : (
                                     <div className="p-2 flex flex-col gap-1">
-                                        {residents.map((user: { id: number; firstName: string; lastName: string }) => (
+                                        {residents.map((user: { id: number; firstName: string; lastName: string; email: string; }) => (
                                             <label 
                                                 key={user.id} 
                                                 className="flex items-center gap-3 p-2 hover:bg-slate-50 dark:hover:bg-slate-900 rounded cursor-pointer transition-colors"

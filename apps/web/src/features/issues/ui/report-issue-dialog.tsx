@@ -15,6 +15,7 @@ import { Input } from "@/shared/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select"
 import { FieldError, FieldGroup, FieldLabel } from "@/shared/ui/field"
 import { Textarea } from "@/shared/ui/textarea"
+import { CreateIssueRequest } from "@/shared/types/issues"
 
 const issueSchema = z.object({
     roomId: z.string().min(1, "Room is required"),
@@ -42,7 +43,7 @@ export default function ReportIssueDialog() {
     })
 
     const { mutate, isPending } = useMutation({
-        mutationFn: (data: { title: string; description: string }) => createIssue(data),
+        mutationFn: (data: CreateIssueRequest) => createIssue(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["issues"] })
             toast.success("Issue reported successfully")
