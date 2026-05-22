@@ -37,12 +37,14 @@ export default function EventDetailsDialog({ open, onOpenChange, selectedEvent, 
     const users = usersResponse?.items || []
 
     const getResidentName = (id: number) => {
-        const user = users.find((u: any) => u.id === id)
+        const user = users.find((u: { id: number; firstName: string; lastName: string }) => u.id === id)
         if (!user) return `ID: ${id}`
         return `${user.firstName} ${user.lastName}`
     }
 
     useEffect(() => {
+        if (!open) return
+        
         if (selectedEvent) {
             setFormData({
                 title: selectedEvent.title,
@@ -60,7 +62,7 @@ export default function EventDetailsDialog({ open, onOpenChange, selectedEvent, 
     }, [selectedEvent, selectedSlot, open])
 
     const { mutate: saveEvent, isPending } = useMutation({
-        mutationFn: (data: any) => selectedEvent ? updateEvent(selectedEvent.id, data) : createEvent(data),
+        mutationFn: (data: { title: string; description: string; start_at: string; end_at: string; type: string }) => selectedEvent ? updateEvent(selectedEvent.id, data) : createEvent(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["events"] })
             toast.success(selectedEvent ? "Event updated" : "Event created")

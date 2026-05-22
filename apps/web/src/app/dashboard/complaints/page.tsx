@@ -1,11 +1,10 @@
 "use client"
 
 import { useAuthStore } from "@/features/auth/store/useAuthStore"
+import ComplaintRow from "@/features/complaints/ui/complaint-row"
 import FileComplaintDialog from "@/features/complaints/ui/file-complaint-dialog"
 import { getComplaintsList, updateComplaintStatus } from "@/services/complaints-service"
 import { Complaint, ComplaintStatus } from "@/shared/types/complaints"
-import { Badge } from "@/shared/ui/badge"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/shared/ui/table"
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query"
 import { MessageSquareWarning } from "lucide-react"
@@ -31,8 +30,6 @@ export default function ComplaintsPage() {
     })
 
     if (isLoading) return <div>Loading complaints...</div>
-
-    console.log(complaints) 
 
     return (
         <div className="flex flex-col gap-6">
@@ -72,49 +69,12 @@ export default function ComplaintsPage() {
                             </TableRow>
                         ) : (
                             complaints.map((complaint: Complaint) => (
-                                <TableRow key={complaint.id}>
-                                    <TableCell className="whitespace-nowrap">
-                                        {new Date(complaint.created_at).toLocaleDateString()}
-                                    </TableCell>
-                                    <TableCell>
-                                        {complaint.is_anonymous ? (
-                                            <span className="italic text-muted-foreground font-normal">Anonymous</span>
-                                        ) : complaint.user ? (
-                                            `${complaint.user.first_name} ${complaint.user.last_name}`
-                                        ) : (
-                                            `User ID: ${complaint.user_id}`
-                                        )}
-                                    </TableCell>
-                                    <TableCell>
-                                        {complaint.room_id ? `Room ${complaint.room_id}` : <span className="text-muted-foreground">-</span>}
-                                    </TableCell>
-                                    <TableCell className="max-w-75 truncate" title={complaint.content}>
-                                        {complaint.content}
-                                    </TableCell>
-                                    <TableCell>
-                                        {isAdmin ? (
-                                            <Select
-                                                value={complaint.status}
-                                                onValueChange={(val) => changeStatus({ id: complaint.id, status: val as ComplaintStatus })}
-                                                disabled={complaint.status === "CLOSED"}
-                                            >
-                                                <SelectTrigger className="w-35 h-8">
-                                                    <SelectValue placeholder={complaint.status} />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="NEW">New</SelectItem>
-                                                    <SelectItem value="REVIEW">Under Review</SelectItem>
-                                                    <SelectItem value="RESOLVED">Resolved</SelectItem>
-                                                    <SelectItem value="CLOSED">Closed</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        ) : (
-                                            <Badge variant={complaint.status === "CLOSED" || complaint.status === "RESOLVED" ? "secondary" : "outline"}>
-                                                {complaint.status}
-                                            </Badge>
-                                        )}
-                                    </TableCell>
-                                </TableRow>
+                                <ComplaintRow
+                                    key={complaint.id}
+                                    complaint={complaint}
+                                    isAdmin={isAdmin}
+                                    changeStatus={changeStatus}
+                                />
                             ))
                         )}
                     </TableBody>

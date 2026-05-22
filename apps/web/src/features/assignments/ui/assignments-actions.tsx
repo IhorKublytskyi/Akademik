@@ -12,7 +12,7 @@ interface AssignmentActionsProps {
 }
 
 export default function AssignmentActions({ assignment }: AssignmentActionsProps) {
-    const [isTerminating, setIsTerminating] = useState(false)
+    const _isTerminating = false
 
     const handleTerminate = () => {
         // TODO: Підключити мутацію React Query, коли бекенд зробить ендпоїнт

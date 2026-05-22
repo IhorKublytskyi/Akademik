@@ -42,7 +42,7 @@ export default function ReportIssueDialog() {
     })
 
     const { mutate, isPending } = useMutation({
-        mutationFn: (data: any) => createIssue(data),
+        mutationFn: (data: { title: string; description: string }) => createIssue(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["issues"] })
             toast.success("Issue reported successfully")

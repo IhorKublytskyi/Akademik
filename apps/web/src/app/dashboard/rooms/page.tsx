@@ -37,7 +37,7 @@ export default function RoomsPage() {
             {isLoading ? (
                 <div className="text-muted-foreground mt-4">Loading rooms...</div>
             ) : error ? (
-                <div className="text-destructive mt-4">Error: {(error as any).message}</div>
+                <div className="text-destructive mt-4">Error: {(error as { message?: string }).message}</div>
             ) : (
                 <div className="flex flex-col gap-6">
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
