@@ -58,14 +58,14 @@ export default function AssignStudentDialog() {
     })
 
     const { mutate: handleAssign, isPending } = useMutation({
-        mutationFn: (data: any) => createAssignment(data),
+        mutationFn: (data: { userId: number; roomId: number; startDate: Date }) => createAssignment(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["assignments"] })
             toast.success("Student successfully assigned to the room")
             reset()
             setOpen(false)
         },
-        onError: (data: any) => {
+        onError: () => {
             toast.error("Failed to assign student")
         }
     })

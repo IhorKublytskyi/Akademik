@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import { Assignment } from "@/shared/types/assignment"
 
 import { Button } from "@/shared/ui/button"
@@ -12,10 +11,7 @@ interface AssignmentActionsProps {
 }
 
 export default function AssignmentActions({ assignment }: AssignmentActionsProps) {
-    const [isTerminating, setIsTerminating] = useState(false)
-
     const handleTerminate = () => {
-        // TODO: Підключити мутацію React Query, коли бекенд зробить ендпоїнт
         console.log("Terminating assignment ID:", assignment.id)
         alert(`This will terminate assignment #${assignment.id}. Waiting for backend API!`)
     }

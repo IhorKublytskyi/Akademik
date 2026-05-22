@@ -50,8 +50,8 @@ export default function AddUserDialog() {
             toast.success("The user has been successfully added!")
             form.reset()
             setOpen(false)
-        } catch (error: any) {
-            toast.error(error.response?.data || "Error creating a user")
+        } catch (error: { response?: { data?: string } } | unknown) {
+            toast.error((error as { response?: { data?: string } }).response?.data || "Error creating a user")
         }
     }
 

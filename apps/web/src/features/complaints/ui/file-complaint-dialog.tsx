@@ -33,7 +33,7 @@ export default function FileComplaintDialog() {
     })
 
     const { mutate, isPending } = useMutation({
-        mutationFn: (data: any) => createComplaint(data),
+        mutationFn: (data: { room_id: number | null; content: string; is_anonymous: boolean }) => createComplaint(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["complaints"] })
             toast.success("Complaint filed successfully")

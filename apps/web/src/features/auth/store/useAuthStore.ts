@@ -27,7 +27,8 @@ export const useAuthStore = create<AuthState>((set) => ({
                 user: response.data,
                 isAuthenticated: true
             })
-        } catch (error) {
+        } catch (_error) {
+            console.error(_error)
             set({
                 user: null,
                 isAuthenticated: false

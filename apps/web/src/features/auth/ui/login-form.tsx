@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation"
 import { useAuthStore } from "../store/useAuthStore"
 import { Controller, useForm } from "react-hook-form"
-import z, { email } from "zod"
+import z from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "sonner"
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/shared/ui/field"
@@ -35,8 +35,8 @@ export default function LoginForm() {
 
             toast.success("Login successful! Welcome to Akademik")
             router.push("/dashboard")
-        } catch (error: any) {
-            const message = error.response?.data?.messsage || "Incorrect email or password"
+        } catch (error: { response?: { data?: { messsage?: string } } } | unknown) {
+            const message = (error as { response?: { data?: { messsage?: string } } }).response?.data?.messsage || "Incorrect email or password"
             toast.error(message)
         }
     }
