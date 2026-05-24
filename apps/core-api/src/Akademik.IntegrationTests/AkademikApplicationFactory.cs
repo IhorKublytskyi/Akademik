@@ -4,8 +4,6 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Akademik.IntegrationTests;
 
@@ -50,7 +48,7 @@ public class AkademikApplicationFactory : WebApplicationFactory<Program>
                 var db = scope.ServiceProvider.GetRequiredService<AkademikDbContext>();
                 db.Database.EnsureDeleted();
                 db.Database.EnsureCreated();
-                // Seeding is done by DbInitializer called in Program.cs
+                DbInitializer.InitializeAsync(db).GetAwaiter().GetResult();
             }
         });
     }

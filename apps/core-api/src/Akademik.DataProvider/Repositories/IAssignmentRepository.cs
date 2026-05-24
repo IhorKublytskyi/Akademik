@@ -9,6 +9,6 @@ public interface IAssignmentRepository
     ValueTask<int> GetActiveAssignmentsCountByRoomIdAsync(int roomId, CancellationToken cancellationToken);
     ValueTask<bool> HasActiveAssignmentByUserIdAsync(int userId, CancellationToken cancellationToken);
     ValueTask<Assignment?> GetActiveAssignmentByUserIdAsync(int userId, CancellationToken cancellationToken);
-    ValueTask<List<Assignment?>> GetRoommatesByRoomIdAsync(int roomId, int currentUserId, CancellationToken cancellationToken);
+    ValueTask<List<Assignment>> GetRoommatesByRoomIdAsync(int roomId, int currentUserId, CancellationToken cancellationToken);
     ValueTask DeleteAsync(int id, CancellationToken cancellationToken);
 }

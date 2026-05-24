@@ -14,15 +14,15 @@ public class AssignmentConfiguration : IEntityTypeConfiguration<Assignment>
 
 		builder
 			.HasOne(a => a.User)
-			.WithOne(u => u.Assignment)
-			.HasForeignKey<Assignment>(a => a.UserId)
+			.WithMany(u => u.Assignments) 
+			.HasForeignKey(a => a.UserId) 
 			.OnDelete(DeleteBehavior.Cascade);
-		
+       
 		builder
 			.HasOne(a => a.Room)
-			.WithOne(r => r.Assignment)
-			.HasForeignKey<Assignment>(a => a.RoomId);
-		
+			.WithMany(r => r.Assignments) // Изменили на WithMany
+			.HasForeignKey(a => a.RoomId);
+       
 		builder
 			.Property(a => a.StartDate)
 			.IsRequired();

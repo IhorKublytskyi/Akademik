@@ -2,7 +2,7 @@ namespace Akademik.Models;
 
 public record RoommatesResponse
 {
-    public int RoomNumber { get; set; }
+    public string RoomNumber { get; set; } = string.Empty;
     public List<UserDto> Roommates {get; set;} = [];
 }
 
