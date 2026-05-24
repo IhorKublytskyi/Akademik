@@ -20,19 +20,19 @@ public static class DbInitializer
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin123"),
                 Role = UserRole.Admin,
                 Status = UserStatus.Active,
-                PhoneNumber = "+70000000000",
+                PhoneNumber = "+48123456789",
                 CreatedAt = DateTime.UtcNow
             };
 
             var student = new User
             {
-                FirstName = "Ivan",
-                LastName = "Ivanov",
-                Email = "ivan@student.com",
+                FirstName = "Ihor",
+                LastName = "Kublytskyi",
+                Email = "i.kublytskyi@student.com",
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword("student123"),
                 Role = UserRole.Resident,
                 Status = UserStatus.Active,
-                PhoneNumber = "+79998887766",
+                PhoneNumber = "+48795039485",
                 CreatedAt = DateTime.UtcNow
             };
 

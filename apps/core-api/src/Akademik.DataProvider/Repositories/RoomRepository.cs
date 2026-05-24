@@ -19,7 +19,7 @@ public class RoomRepository : IRoomRepository
         int count = await query.CountAsync(cancellationToken);
 
         List<Room> rooms = await query
-            .Include(r => r.Assignment)
+            .Include(r => r.Assignments)
             .OrderBy(r => r.Id)
             .Skip(pagination.Skip)
             .Take(pagination.PageSize)
