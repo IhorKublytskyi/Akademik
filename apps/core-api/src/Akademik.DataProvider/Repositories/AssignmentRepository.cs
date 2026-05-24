@@ -63,17 +63,24 @@ public sealed class AssignmentRepository : IAssignmentRepository
 
     public async ValueTask<Assignment?> GetActiveAssignmentByUserIdAsync(int userId, CancellationToken cancellationToken)
     {
-        return await _dbContext.Assignments
+        Assignment? assignment = await _dbContext.Assignments
             .AsNoTracking()
+            .Include(a => a.Room)
+            .Include(a => a.User)
             .FirstOrDefaultAsync(a => a.UserId == userId && a.IsActive, cancellationToken);
+        
+        return assignment;
     }
 
-    public async ValueTask<List<User>> GetRoommatesByRoomIdAsync(int roomId, int currentUserId, CancellationToken cancellationToken)
+    public async ValueTask<List<Assignment?>> GetRoommatesByRoomIdAsync(int roomId, int currentUserId, CancellationToken cancellationToken)
     {
-        return await _dbContext.Assignments
-            .Where(a => a.RoomId == roomId && a.IsActive && a.UserId != currentUserId)
-            .Select(a => a.User!)
+        List<Assignment?> roommates = await _dbContext.Assignments
+            .Where(a => a.RoomId == roomId && a.IsActive && a.UserId == currentUserId)
+            .Include(a => a.User)
+            .Include(a => a.Room)
             .ToListAsync(cancellationToken);
+
+        return roommates;
     }
 
     public async ValueTask DeleteAsync(int id, CancellationToken cancellationToken)

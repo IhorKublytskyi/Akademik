@@ -16,6 +16,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer; 
 using Microsoft.IdentityModel.Tokens; 
 using FluentValidation; 
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +28,12 @@ builder.Services.AddValidatorsFromAssemblyContaining<CreateAssignmentRequestVali
 builder.Services.AddDbContext<AkademikDbContext>(options =>
 {
     options.UseNpgsql(builder.Configuration.GetConnectionString("AkademikConnectionString"));
+});
+
+
+builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
+{
+    options.SerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
 });
 
 builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
@@ -271,9 +279,22 @@ app.MapGet("/api/core/assignments/roommates", async (
     if (string.IsNullOrEmpty(token)) return Results.Unauthorized();
     var idClaim = jwtService.ExtractClaim(token, "sub");
     if (idClaim is null) return Results.Unauthorized();
-    var roommates = await service.GetRoommatesAsync(int.Parse(idClaim.Value), cancellationToken);
-    return Results.Ok(roommates.Select(r => UserModel.FromUser(r)));
-}).RequireAuthorization();
+    var response = await service.GetRoommatesAsync(int.Parse(idClaim.Value), cancellationToken);
+
+    var result = new RoommatesResponse
+    {
+        RoomNumber = response.RoomNumber,
+        Roommates = response.Assignments.Select(a => new UserDto
+        {
+            Id = a.UserId,
+            Email = a.User.Email,
+            FirstName = a.User.FirstName,
+            LastName = a.User.LastName
+        }).ToList()
+    };
+
+    return Results.Ok(result);
+});
 
 app.MapPost("/api/core/users-get", async (
     [FromBody] UsersListRequest request,

@@ -20,27 +20,27 @@ Posiada panel administracyjny do zarządzania użytkownikami, zgłoszeniami i do
 - [x] Implement /me router
 
 **Milestone 2 — Core API**
-- [ ] Implement Issues API
-- [ ] Implement Events API
-- [ ] Implement Complaints API
+- [x] Implement Issues API
+- [x] Implement Events API
+- [x] Implement Complaints API
 
 **Milestone 3 — Integration**
-- [ ] Prepare notification service and email integration
-- [ ] Prepare scheduled tasks structure and service interaction
-- [ ] Global UI and auth flow
-- [ ] Integration of backend with frontend
+- [x] Prepare notification service and email integration
+- [x] Prepare scheduled tasks structure and service interaction
+- [x] Global UI and auth flow
+- [x] Integration of backend with frontend
 
 **Milestone 4 — MVP / Demo**
-- [ ] Testing
-- [ ] Bug fixing
-- [ ] Final integration
-- [ ] Deployment readiness
+- [x] Testing (integration tests — 27 passed)
+- [x] Bug fixing
+- [x] Final integration
+- [x] Deployment readiness (Docker multistage builds, CI/CD)
 
 ## Autorzy
 
-- *(uzupełnić — imię nazwisko – rola)*
-- *(uzupełnić — imię nazwisko – rola)*
-- *(uzupełnić — imię nazwisko – rola)*
+- Katsiaryna Kozhych - service-api
+- Ihor Kublytskyi - core-api
+- Anton Hryshchuk - web
 
 ## Technologie
 
@@ -198,12 +198,8 @@ docker-compose.yml
 
 ## Zrzuty ekranu
 
-*(dodać po ukończeniu UI)*
-
-```
-![login](docs/screenshots/login.png)
-![dashboard](docs/screenshots/dashboard.png)
-```
+![login](docs/screenshots/login.jpg)
+![dashboard](docs/screenshots/dashboard.jpg)
 
 ## Status projektu
 

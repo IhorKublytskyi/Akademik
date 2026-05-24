@@ -29,6 +29,7 @@ export interface CreateAssignmentRequest {
 }
 
 export interface Roommates {
+    $id: string;
     roomNumber: number;
-    roommatesArray: User[];
+    assignments: User[];
 }
