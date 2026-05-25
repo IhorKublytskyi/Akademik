@@ -17,7 +17,6 @@ using Akademik.Validators;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -131,7 +130,10 @@ using (IServiceScope scope = app.Services.CreateScope())
 	{
 		AkademikDbContext context = services.GetRequiredService<AkademikDbContext>();
 
-		await context.Database.MigrateAsync();
+		if(context.Database.IsRelational())
+		{
+			await context.Database.MigrateAsync();
+		}
 
 		if (app.Environment.IsDevelopment())
 		{
@@ -489,3 +491,8 @@ app.MapGet("/api/core/users-get/{id:int}", async (int id,
 }).RequireAuthorization("AdminOnly");
 
 app.Run();
+
+public partial class Program
+{
+	
+}
