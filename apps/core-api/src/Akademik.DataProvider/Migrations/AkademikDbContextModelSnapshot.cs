@@ -17,7 +17,7 @@ namespace Akademik.DataProvider.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.4")
+                .HasAnnotation("ProductVersion", "9.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -47,11 +47,9 @@ namespace Akademik.DataProvider.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RoomId")
-                        .IsUnique();
+                    b.HasIndex("RoomId");
 
-                    b.HasIndex("UserId")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
                     b.ToTable("assignments", (string)null);
                 });
@@ -188,14 +186,14 @@ namespace Akademik.DataProvider.Migrations
             modelBuilder.Entity("Akademik.DataProvider.Models.Assignment", b =>
                 {
                     b.HasOne("Akademik.DataProvider.Models.Room", "Room")
-                        .WithOne("Assignment")
-                        .HasForeignKey("Akademik.DataProvider.Models.Assignment", "RoomId")
+                        .WithMany("Assignments")
+                        .HasForeignKey("RoomId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Akademik.DataProvider.Models.User", "User")
-                        .WithOne("Assignment")
-                        .HasForeignKey("Akademik.DataProvider.Models.Assignment", "UserId")
+                        .WithMany("Assignments")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -217,12 +215,12 @@ namespace Akademik.DataProvider.Migrations
 
             modelBuilder.Entity("Akademik.DataProvider.Models.Room", b =>
                 {
-                    b.Navigation("Assignment");
+                    b.Navigation("Assignments");
                 });
 
             modelBuilder.Entity("Akademik.DataProvider.Models.User", b =>
                 {
-                    b.Navigation("Assignment");
+                    b.Navigation("Assignments");
                 });
 #pragma warning restore 612, 618
         }

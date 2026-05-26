@@ -20,13 +20,13 @@ jobs:
 
       - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "10.x"
+          dotnet-version: "9.x"
 
       - name: Restore
-        run: dotnet restore
+        run: dotnet restore src/Akademik/Akademik.csproj
 
       - name: Build
-        run: dotnet build --no-restore --configuration Release
+        run: dotnet build src/Akademik/Akademik.csproj --no-restore --configuration Release
 
       - name: Test
-        run: dotnet test --no-build --configuration Release --verbosity minimal
+        run: dotnet test src/Akademik.IntegrationTests/Akademik.IntegrationTests.csproj --no-build --configuration Release --verbosity minimal

@@ -72,10 +72,10 @@ public sealed class AssignmentRepository : IAssignmentRepository
         return assignment;
     }
 
-    public async ValueTask<List<Assignment?>> GetRoommatesByRoomIdAsync(int roomId, int currentUserId, CancellationToken cancellationToken)
+    public async ValueTask<List<Assignment>> GetRoommatesByRoomIdAsync(int roomId, int currentUserId, CancellationToken cancellationToken)
     {
-        List<Assignment?> roommates = await _dbContext.Assignments
-            .Where(a => a.RoomId == roomId && a.IsActive && a.UserId == currentUserId)
+        List<Assignment> roommates = await _dbContext.Assignments
+            .Where(a => a.RoomId == roomId && a.IsActive && a.UserId != currentUserId)
             .Include(a => a.User)
             .Include(a => a.Room)
             .ToListAsync(cancellationToken);

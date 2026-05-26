@@ -47,7 +47,7 @@ public class UserService : IUserService
 	{
 		await _repository.UpdateAsync(user, cancellationToken);
 		
-		return user;
+		return await _repository.GetByIdAsync(user.Id, cancellationToken);
 	}
 
     public async ValueTask DeleteAsync(int id, CancellationToken cancellationToken)

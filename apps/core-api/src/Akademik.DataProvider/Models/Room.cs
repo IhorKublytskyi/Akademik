@@ -10,5 +10,5 @@ public sealed class Room
 	[Range(0, 3)]
 	public required int Capacity { get; set; }
 	public RoomStatus Status { get; set; } = RoomStatus.Closed;
-	public Assignment? Assignment { get; set; }
+	public ICollection<Assignment> Assignments { get; set; } = new List<Assignment>();
 }

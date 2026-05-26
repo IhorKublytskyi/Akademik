@@ -1,5 +1,5 @@
 import { api } from "@/shared/api/api-client"
-import { Assignment, CreateAssignmentRequest, PagedResult, Roommates } from "@/shared/types/assignment"
+import { Assignment, CreateAssignmentRequest, PagedResult, RoommatesResponse } from "@/shared/types/assignment"
 
 export const getAssignmentsList = async (pageNumber = 1, pageSize = 10): Promise<PagedResult<Assignment>> => {
     const response = await api.post<PagedResult<Assignment>>("/api/core/assignments-get", {
@@ -25,7 +25,7 @@ export const createAssignment = async (data: CreateAssignmentRequest): Promise<A
     return response.data
 }
 
-export const getRoommates = async (): Promise<Roommates> => {
-    const response = await api.get<Roommates>("/api/core/assignments/roommates")
+export const getRoommates = async (): Promise<RoommatesResponse> => {
+    const response = await api.get<RoommatesResponse>("/api/core/assignments/roommates")
     return response.data
 }

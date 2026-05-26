@@ -9,6 +9,9 @@ export default function ResidentDashboard() {
         queryFn: getRoommates
     })
 
+    const roommatesList = roommates?.roommates?.$values || []
+    const hasRoommates = roommatesList.length > 0
+
     console.log(roommates)
 
     return (
@@ -21,11 +24,11 @@ export default function ResidentDashboard() {
                 <CardContent>
                     {isLoading ? (
                         <p className="text-sm text-muted-foreground mt-4">Loading room data...</p>
-                    ) : roommates && roommates.assignments.length > 0 ? (
+                    ) : hasRoommates ? (
                         <div className="mt-4 space-y-4">
                             <p className="text-sm font-medium">People living with you:</p>
-                            <div className="grid gap-4 sm:grid-cols-2">
-                                {roommates.assignments.map((mate) => (
+                            <div className="flex flex-col gap-4">
+                                {roommatesList.map((mate) => (
                                     <div key={mate.id} className="flex items-center space-x-4 rounded-md border p-3">
                                         <div className="flex-1 space-y-1">
                                             <p className="text-sm font-medium leading-none">

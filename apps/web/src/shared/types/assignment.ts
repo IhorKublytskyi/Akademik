@@ -28,8 +28,17 @@ export interface CreateAssignmentRequest {
     startDate: string | Date;
 }
 
-export interface Roommates {
-    $id: string;
-    roomNumber: number;
-    assignments: User[];
+export interface Roommate {
+    id: number
+    email: string
+    firstName: string
+    lastName: string
+}
+
+export interface RoommatesResponse {
+    roomNumber: number
+    roommates: {
+        $id: string
+        $values: Roommate[]
+    }
 }
