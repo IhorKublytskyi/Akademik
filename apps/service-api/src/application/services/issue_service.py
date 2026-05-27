@@ -30,16 +30,18 @@ async def create_issue(
         status=IssueStatus.NEW,
     )
     db.add(issue)
-    await db.flush()
-
-    await notifier.notify(
-        user_id=user_id,
-        title="Заявка создана",
-        content=f'Ваша заявка "{data.title}" успешно зарегистрирована.',
-    )
-
     await db.commit()
     await db.refresh(issue)
+
+    try:
+        await notifier.notify(
+            user_id=user_id,
+            title="Заявка создана",
+            content=f'Ваша заявка "{data.title}" успешно зарегистрирована.',
+        )
+    except Exception:
+        pass  # notification failure must not block issue creation
+
     return issue
 
 
@@ -81,14 +83,16 @@ async def update_issue_status(
     if data.status == IssueStatus.CLOSED:
         issue.closed_at = utc_now_naive()
 
-    await db.flush()
-
-    await notifier.notify(
-        user_id=issue.user_id,
-        title="Статус заявки изменён",
-        content=f'Статус вашей заявки "{issue.title}" изменён: {old_status} → {data.status}.',
-    )
-
     await db.commit()
     await db.refresh(issue)
+
+    try:
+        await notifier.notify(
+            user_id=issue.user_id,
+            title="Статус заявки изменён",
+            content=f'Статус вашей заявки "{issue.title}" изменён: {old_status} → {data.status}.',
+        )
+    except Exception:
+        pass  # notification failure must not block status update
+
     return issue
