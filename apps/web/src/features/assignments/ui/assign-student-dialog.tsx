@@ -36,7 +36,7 @@ export default function AssignStudentDialog() {
 
     const { data: usersData, isLoading: isLoadingUsers } = useQuery({
         queryKey: ["users", "dropdown"],
-        queryFn: () => getUsersList(1, 100),
+        queryFn: () => getUsersList(1, 49),
         enabled: open
     })
 
@@ -44,7 +44,7 @@ export default function AssignStudentDialog() {
 
     const { data: roomsData, isLoading: isLoadingRooms } = useQuery({
         queryKey: ["rooms", "dropdown"],
-        queryFn: () => getRoomsList(1, 100),
+        queryFn: () => getRoomsList(1, 49),
         enabled: open
     })
 

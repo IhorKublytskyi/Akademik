@@ -11,4 +11,5 @@ public interface IAssignmentRepository
     ValueTask<Assignment?> GetActiveAssignmentByUserIdAsync(int userId, CancellationToken cancellationToken);
     ValueTask<List<Assignment>> GetRoommatesByRoomIdAsync(int roomId, int currentUserId, CancellationToken cancellationToken);
     ValueTask DeleteAsync(int id, CancellationToken cancellationToken);
+    ValueTask<Assignment?> GetByIdAsync(int id, CancellationToken cancellationToken);
 }

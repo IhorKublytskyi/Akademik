@@ -43,7 +43,6 @@ public class RoomRepository : IRoomRepository
     public async ValueTask<Room?> GetByIdAsync(int id, CancellationToken cancellationToken)
     {
         return await _dbContext.Rooms
-            .AsNoTracking()
             .FirstOrDefaultAsync(r => r.Id == id, cancellationToken);
     }
 
