@@ -18,38 +18,47 @@ public sealed class AssignmentService : IAssignmentService
 	}
 
 	public async ValueTask<Assignment> CreateAsync(Assignment assignment, CancellationToken cancellationToken)
-	{
-		cancellationToken.ThrowIfCancellationRequested();
+{
+    cancellationToken.ThrowIfCancellationRequested();
 
-		var hasActiveAssignment = await _repository.HasActiveAssignmentByUserIdAsync(assignment.UserId, cancellationToken);
-		if (hasActiveAssignment)
-		{
-			throw new InvalidOperationException("User already has an active assignment.");
-		}
+    var hasActiveAssignment = await _repository.HasActiveAssignmentByUserIdAsync(assignment.UserId, cancellationToken);
+    if (hasActiveAssignment)
+    {
+        throw new InvalidOperationException("User already has an active assignment.");
+    }
 
-		var user = await _userRepository.GetByIdAsync(assignment.UserId, cancellationToken);
+    var user = await _userRepository.GetByIdAsync(assignment.UserId, cancellationToken);
 
-		if(user is null || user.Status == UserStatus.Blocked)
-		{
-			throw new InvalidOperationException("Couldn't assign this user to this room.");
-		}
+    if(user is null || user.Status == UserStatus.Blocked)
+    {
+        throw new InvalidOperationException("Couldn't assign this user to this room.");
+    }
 
-		var room = await _roomRepository.GetByIdAsync(assignment.RoomId, cancellationToken);
-		if (room == null)
-		{
-			throw new ArgumentException("Room not found.");
-		}
+    var room = await _roomRepository.GetByIdAsync(assignment.RoomId, cancellationToken);
+    if (room == null)
+    {
+        throw new ArgumentException("Room not found.");
+    }
 
-		var activeAssignmentsCount = await _repository.GetActiveAssignmentsCountByRoomIdAsync(assignment.RoomId, cancellationToken);
-		if (activeAssignmentsCount >= room.Capacity)
-		{
-			throw new InvalidOperationException("Room capacity exceeded.");
-		}
+    var activeAssignmentsCount = await _repository.GetActiveAssignmentsCountByRoomIdAsync(assignment.RoomId, cancellationToken);
+    if (activeAssignmentsCount >= room.Capacity)
+    {
+        throw new InvalidOperationException("Room capacity exceeded.");
+    }
 
-		await _repository.CreateAsync(assignment, cancellationToken);
+    await _repository.CreateAsync(assignment, cancellationToken);
 
-		return assignment;
-	}
+    var newAssignmentsCount = activeAssignmentsCount + 1;
+    var newStatus = newAssignmentsCount >= room.Capacity ? RoomStatus.Closed : RoomStatus.Occupied;
+
+    if (room.Status != newStatus)
+    {
+        room.Status = newStatus;
+        await _roomRepository.UpdateAsync(room, cancellationToken);
+    }
+
+    return assignment;
+}
 
 	public async ValueTask<PagedResult<Assignment>> GetAllAsync(Pagination pagination, CancellationToken cancellationToken)
 	{
@@ -78,7 +87,26 @@ public sealed class AssignmentService : IAssignmentService
 	}
 
 	public async ValueTask DeleteAsync(int id, CancellationToken cancellationToken)
-	{
-		await _repository.DeleteAsync(id, cancellationToken);
-	}
+{
+    var assignment = await _repository.GetByIdAsync(id, cancellationToken);
+    if (assignment != null)
+    {
+        await _repository.DeleteAsync(id, cancellationToken);
+
+        var room = await _roomRepository.GetByIdAsync(assignment.RoomId, cancellationToken);
+        if (room != null)
+        {
+            var activeAssignmentsCount = await _repository.GetActiveAssignmentsCountByRoomIdAsync(assignment.RoomId, cancellationToken);
+            
+            var newStatus = activeAssignmentsCount == 0 ? RoomStatus.Available : 
+                           (activeAssignmentsCount >= room.Capacity ? RoomStatus.Closed : RoomStatus.Occupied);
+
+            if (room.Status != newStatus)
+            {
+                room.Status = newStatus;
+                await _roomRepository.UpdateAsync(room, cancellationToken);
+            }
+        }
+    }
+}
 }

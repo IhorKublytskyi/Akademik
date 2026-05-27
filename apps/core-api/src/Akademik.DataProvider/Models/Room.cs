@@ -5,10 +5,15 @@ namespace Akademik.DataProvider.Models;
 public sealed class Room
 {
 	public int Id { get; set; }
+	
 	public required string Number { get; set; }
+
 	public int Floor { get; set; }
+
 	[Range(0, 3)]
 	public required int Capacity { get; set; }
-	public RoomStatus Status { get; set; } = RoomStatus.Closed;
+
+	public RoomStatus Status { get; set; }
+
 	public ICollection<Assignment> Assignments { get; set; } = new List<Assignment>();
 }

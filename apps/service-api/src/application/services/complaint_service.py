@@ -22,24 +22,26 @@ async def create_complaint(
     notifier: NotificationPort,
 ) -> ComplaintModel:
     complaint = ComplaintModel(
-        user_id=None if data.is_anonymous else user_id,
+        user_id=user_id,
         room_id=data.room_id,
         content=data.content,
         is_anonymous=data.is_anonymous,
         status=ComplaintStatus.NEW,
     )
     db.add(complaint)
-    await db.flush()
-
-    if not data.is_anonymous:
-        await notifier.notify(
-            user_id=user_id,
-            title="Жалоба зарегистрирована",
-            content="Ваша жалоба принята и будет рассмотрена.",
-        )
-
     await db.commit()
     await db.refresh(complaint)
+
+    if not data.is_anonymous:
+        try:
+            await notifier.notify(
+                user_id=user_id,
+                title="Complaint registered",
+                content="Complaint on review.",
+            )
+        except Exception:
+            pass  # notification failure must not block complaint creation
+
     return complaint
 
 
@@ -81,15 +83,17 @@ async def update_complaint_status(
     if data.status == ComplaintStatus.CLOSED:
         complaint.closed_at = utc_now_naive()
 
-    await db.flush()
-
-    if complaint.user_id is not None:
-        await notifier.notify(
-            user_id=complaint.user_id,
-            title="Статус жалобы изменён",
-            content=f"Статус вашей жалобы изменён: {old_status} → {data.status}.",
-        )
-
     await db.commit()
     await db.refresh(complaint)
+
+    if complaint.user_id is not None and not complaint.is_anonymous:
+        try:
+            await notifier.notify(
+                user_id=complaint.user_id,
+                title="Status Changed",
+                content=f"Status Changed: {old_status} → {data.status}.",
+            )
+        except Exception:
+            pass  # notification failure must not block status update
+
     return complaint
