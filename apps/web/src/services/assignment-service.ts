@@ -30,3 +30,7 @@ export const getRoommates = async (): Promise<User[]> => {
     const response = await api.get<User[]>("/api/core/assignments/roommates")
     return response.data
 }
+
+export const deleteAssignment = async (id: number): Promise<void> => {
+    await api.delete(`/api/core/assignments/${id}`)
+}
