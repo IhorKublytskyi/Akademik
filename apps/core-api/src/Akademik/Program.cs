@@ -286,27 +286,28 @@ app.MapPost("/api/core/rooms-edit", async (
 }).RequireAuthorization("AdminOnly");
 
 app.MapPost("/api/core/assignments-get", async (
-	[FromBody] ResidentsListRequest request,
-	IAssignmentService service,
-	IValidator<Pagination> validator,
-	CancellationToken cancellationToken) =>
+    [FromBody] ResidentsListRequest request,
+    IAssignmentService service,
+    IValidator<Pagination> validator,
+    CancellationToken cancellationToken) =>
 {
-	var validationResult = await validator.ValidateAsync(request.Pagination, cancellationToken);
+    var validationResult = await validator.ValidateAsync(request.Pagination, cancellationToken);
 
-	if (validationResult.IsValid is false)
-	{
-		return Results.BadRequest(validationResult);
-	}
+    if (validationResult.IsValid is false)
+    {
+        return Results.BadRequest(validationResult);
+    }
 
-	PagedResult<Assignment> assignments = await service
-		.GetAllAsync(request.Pagination, cancellationToken);
-	
-	var result = assignments.Items
-		.Select(a => new AssignmentModel(
-			UserModel.FromUser(a.User), 
-			RoomModel.FromRoom(a.Room)));
+    PagedResult<Assignment> assignments = await service
+        .GetAllAsync(request.Pagination, cancellationToken);
+    
+    var result = new PagedResult<AssignmentModel>
+    {
+        Items = assignments.Items.Select(AssignmentModel.FromAssignment).ToList(),
+        Count = assignments.Count
+    };
 
-	return Results.Ok(result);
+    return Results.Ok(result);
 }).RequireAuthorization("AdminOnly");
 
 app.MapPost("/api/core/assignments-add", async (
