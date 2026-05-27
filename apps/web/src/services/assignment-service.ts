@@ -29,3 +29,7 @@ export const getRoommates = async (): Promise<RoommatesResponse> => {
     const response = await api.get<RoommatesResponse>("/api/core/assignments/roommates")
     return response.data
 }
+
+export const deleteAssignment = async (id: number): Promise<void> => {
+    await api.delete(`/api/core/assignments/${id}`)
+}

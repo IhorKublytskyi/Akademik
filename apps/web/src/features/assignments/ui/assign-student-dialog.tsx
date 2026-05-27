@@ -35,7 +35,7 @@ export default function AssignStudentDialog() {
 
     const { data: usersData, isLoading: isLoadingUsers } = useQuery({
         queryKey: ["users", "dropdown"],
-        queryFn: () => getUsersList(1, 100),
+        queryFn: () => getUsersList(1, 49),
         enabled: open
     })
 
@@ -43,11 +43,11 @@ export default function AssignStudentDialog() {
 
     const { data: roomsData, isLoading: isLoadingRooms } = useQuery({
         queryKey: ["rooms", "dropdown"],
-        queryFn: () => getRoomsList(1, 100),
+        queryFn: () => getRoomsList(1, 49),
         enabled: open
     })
 
-    console.log(usersData, roomsData)
+    console.log(roomsData)
 
     const { control, handleSubmit, reset, formState: { errors } } = useForm<AssignFormValues>({
         resolver: zodResolver(assignSchema),
@@ -133,7 +133,7 @@ export default function AssignStudentDialog() {
                                             <SelectValue placeholder={isLoadingRooms ? "Loading..." : "Select room"} />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {roomsData?.items?.filter(r => r.status === 0).map(room => {
+                                            {roomsData?.items?.filter(r => r.status === 0 || r.status === 2).map(room => {
                                                 const roomStatus =
                                                     room.status === 0 ? "Available" :
                                                         room.status === 1 ? "Occupied" :

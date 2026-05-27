@@ -18,7 +18,7 @@ export default function AssignmentsPage() {
         queryFn: () => getAssignmentsList(1, 10)
     })
 
-    const assignments = data?.items || []
+    const assignments = data || []
 
     if (isLoading) return <div>Loading assignments...</div>
     if (error) return <div>Error loading assignments</div>
