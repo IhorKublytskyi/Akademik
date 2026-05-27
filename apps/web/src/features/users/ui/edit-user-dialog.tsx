@@ -36,7 +36,7 @@ export default function EditUserDialog({ user, isOpen, onClose }: EditUserDialog
             toast.success("User updated successfully!")
             onClose()
         },
-        onError: (error: any) => {
+        onError: (error: { message?: string } | unknown) => {
             console.error("Failed to update", error)
             toast.error("Failed to update user")
         }

@@ -6,8 +6,15 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
-from src.infrastructure.database.models.base import Base
-from src.infrastructure.settings import get_settings
+from src.infrastructure.config import settings
+from src.infrastructure.database.connection import Base
+from src.infrastructure.database.models import (  # noqa: F401
+    complaint,
+    event,
+    issue,
+    notification,
+    qr,
+)
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -23,8 +30,16 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 target_metadata = Base.metadata
-settings = get_settings()
 config.set_main_option("sqlalchemy.url", settings.database_url)
+
+_EF_TABLES = {
+    "users", "rooms", "assignments", "refresh_tokens", "__EFMigrationsHistory"
+}
+
+def include_object(object, name, type_, reflected, compare_to):
+    if type_ == "table" and name in _EF_TABLES:
+        return False
+    return True
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
@@ -51,6 +66,7 @@ def run_migrations_offline() -> None:
         dialect_opts={"paramstyle": "named"},
         compare_type=True,
         compare_server_default=True,
+        include_object=include_object,
     )
 
     with context.begin_transaction():
@@ -63,6 +79,7 @@ def do_run_migrations(connection: Connection) -> None:
         target_metadata=target_metadata,
         compare_type=True,
         compare_server_default=True,
+        include_object=include_object,
     )
 
     with context.begin_transaction():

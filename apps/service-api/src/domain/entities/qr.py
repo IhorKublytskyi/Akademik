@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, field_validator, model_validator
 
 from src.domain.enums import QRAccessType, QRStatus
 
@@ -10,6 +10,19 @@ class QRCodeCreate(BaseModel):
     access_type: QRAccessType = QRAccessType.BUILDING
     valid_from: datetime
     valid_to: datetime
+
+    @field_validator('valid_from', 'valid_to', mode='before')
+    @classmethod
+    def strip_timezone(cls, v: str | datetime) -> datetime:
+        if isinstance(v, str):
+            try:
+                v = datetime.fromisoformat(v.replace("Z", "+00:00"))
+            except ValueError:
+                pass
+
+        if isinstance(v, datetime) and v.tzinfo is not None:
+            return v.replace(tzinfo=None)
+        return v
 
     @model_validator(mode="after")
     def check_dates(self) -> "QRCodeCreate":

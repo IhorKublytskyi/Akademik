@@ -14,7 +14,7 @@ export interface User {
 
 export interface UsersListResponse {
     items: User[];
-    totalCount: number;
+    count: number;
     page: number;
     pageSize: number;
 }

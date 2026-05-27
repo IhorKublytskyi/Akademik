@@ -39,8 +39,8 @@ export default function AssignmentsPage() {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Assignment ID</TableHead>
-                                <TableHead>User ID</TableHead>
-                                <TableHead>Room ID</TableHead>
+                                <TableHead>Resident</TableHead>
+                                <TableHead>Room</TableHead>
                                 <TableHead>Move-in Date</TableHead>
                                 <TableHead>Status</TableHead>
                                 <TableHead>Actions</TableHead>
@@ -66,8 +66,17 @@ export default function AssignmentsPage() {
                                     <TableRow key={assignment.id}>
                                         <TableCell className="font-medium">#{assignment.id}</TableCell>
 
-                                        <TableCell>Resident ID: {assignment.userId}</TableCell>
-                                        <TableCell>Room ID: {assignment.roomId}</TableCell>
+                                        <TableCell>
+                                            {assignment.user
+                                                ? `${assignment.user.firstName} ${assignment.user.lastName}`
+                                                : `User ID: ${assignment.userId}`}
+                                        </TableCell>
+
+                                        <TableCell>
+                                            {assignment.room
+                                                ? `Room ${assignment.room.number} (Floor ${assignment.room.floor})`
+                                                : `Room ID: ${assignment.roomId}`}
+                                        </TableCell>
 
                                         <TableCell>{new Date(assignment.startDate).toLocaleDateString()}</TableCell>
                                         <TableCell>

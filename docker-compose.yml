@@ -7,6 +7,13 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -19,30 +26,79 @@ services:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
     ports:
-      - "15672:15672"
+      - "15673:15672"
     networks:
       - internal
 
   core-api:
     build: ./apps/core-api
+    ports:
+      - "3001:8080"
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - ConnectionStrings__AkademikConnectionString=Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+    networks:
+      - internal
+
+  migrate:
+    build: ./apps/service-api
+    command: alembic upgrade head
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+    depends_on:
+      - postgres
+    networks:
+      - internal
+    restart: "no"
+
+  service-api:
+    build: ./apps/service-api
+    command: uvicorn src.main:app --host 0.0.0.0 --port 3002
+    ports:
+    - "3002:3002"
     restart: unless-stopped
     environment:
-      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       RABBITMQ_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASS}@rabbitmq:5672
-      PORT: 3001
+      JWT_SECRET: ${JWT_SECRET}
+      PORT: 3002
+    volumes:
+      - ./apps/service-api/alembic:/app/alembic
+    depends_on:
+      - migrate
+      - rabbitmq
+    networks:
+      - internal
+
+  celery-worker:
+    build: ./apps/service-api
+    restart: unless-stopped
+    command: celery -A src.infrastructure.celery.celery_app worker --loglevel=info
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      RABBITMQ_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASS}@rabbitmq:5672
+      JWT_SECRET: ${JWT_SECRET}
     depends_on:
       - postgres
       - rabbitmq
     networks:
       - internal
 
-  service-api:
+  celery-beat:
     build: ./apps/service-api
     restart: unless-stopped
+    command: celery -A src.infrastructure.celery.celery_app beat --loglevel=info
     environment:
-      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       RABBITMQ_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASS}@rabbitmq:5672
-      PORT: 3002
+      JWT_SECRET: ${JWT_SECRET}
     depends_on:
       - postgres
       - rabbitmq
@@ -52,6 +108,15 @@ services:
   web:
     build: ./apps/web
     restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./apps/web:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost
+      - WATCHPACK_POLLING=true
     networks:
       - internal
 
@@ -62,10 +127,11 @@ services:
       - "80:80"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
-      - core-api
       - service-api
-      - web
+      - core-api
     networks:
       - internal
 

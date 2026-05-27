@@ -30,14 +30,20 @@ export default function UserActions({ user }: UserActionsProps) {
         }
     })
 
-    const handleDelete = async () => {
+    const { mutate: deleteUser } = useMutation({
+        mutationFn: () => api.delete(`/api/core/users/${user.id}`),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["users"] })
+            toast.success("User deleted")
+        },
+        onError: () => {
+            toast.error("Error during deletion")
+        }
+    })
+
+    const handleDelete = () => {
         if (confirm(`Are you sure you want to delete ${user.firstName} ${user.lastName}?`)) {
-            try {
-                await api.delete(`/api/core/users/${user.id}`)
-                toast.success("User deleted")
-            } catch (error) {
-                toast.error("Error during deletion")
-            }
+            deleteUser()
         }
     }
 

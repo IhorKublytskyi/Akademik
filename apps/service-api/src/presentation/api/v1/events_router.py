@@ -27,7 +27,7 @@ async def list_events(
     db: AsyncSession = Depends(get_db),
     user: TokenPayload = Depends(get_current_user),
 ):
-    return await event_service.get_user_events(db, user_id=user.user_id)
+    return await event_service.get_user_events(db, user_id=user.user_id, role=user.role)
 
 
 @router.post("/v1/events", response_model=EventResponse, status_code=status.HTTP_201_CREATED)

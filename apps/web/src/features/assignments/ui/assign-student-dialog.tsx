@@ -58,14 +58,14 @@ export default function AssignStudentDialog() {
     })
 
     const { mutate: handleAssign, isPending } = useMutation({
-        mutationFn: (data: any) => createAssignment(data),
+        mutationFn: (data: { userId: number; roomId: number; startDate: Date }) => createAssignment(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["assignments"] })
             toast.success("Student successfully assigned to the room")
             reset()
             setOpen(false)
         },
-        onError: (data: any) => {
+        onError: () => {
             toast.error("Failed to assign student")
         }
     })
@@ -132,11 +132,17 @@ export default function AssignStudentDialog() {
                                             <SelectValue placeholder={isLoadingRooms ? "Loading..." : "Select room"} />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {roomsData?.items?.map(room => (
-                                                <SelectItem key={room.id} value={room.id.toString()}>
-                                                    Room {room.number} (Floor {room.floor}) - {room.status}
-                                                </SelectItem>
-                                            ))}
+                                            {roomsData?.items?.filter(r => r.status === 0).map(room => {
+                                                const roomStatus =
+                                                    room.status === 0 ? "Available" :
+                                                        room.status === 1 ? "Occupied" :
+                                                            "Closed"
+                                                return (
+                                                    <SelectItem key={room.id} value={room.id.toString()}>
+                                                        Room {room.number} (Floor {room.floor}) - {roomStatus}
+                                                    </SelectItem>
+                                                )
+                                            })}
                                         </SelectContent>
                                     </Select>
                                 </Field>

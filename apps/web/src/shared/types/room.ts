@@ -1,4 +1,4 @@
-export type RoomStatus = "Available" | "Occupied" | "Closed" | string
+export type RoomStatus = 0 | 1 | 2
 
 export interface Room {
     id: number;
@@ -18,5 +18,5 @@ export interface UpdateRoomRequest {
     number: string;
     floor: number;
     capacity: number;
-    status: string;
+    status: number;
 }

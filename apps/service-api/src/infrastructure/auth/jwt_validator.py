@@ -12,18 +12,6 @@ class TokenPayload:
 
 
 def decode_token(token: str) -> TokenPayload:
-    """
-    Validates a JWT issued by core-api (ASP.NET, HS256).
-
-    Expected claims:
-      sub    — user ID as string          (JwtRegisteredClaimNames.Sub)
-      email  — user email                 (JwtRegisteredClaimNames.Email)
-      role   — "Admin" or "Resident"      (ClaimTypes.Role → mapped to "role" by JwtSecurityTokenHandler)
-      status — "Active" or "Blocked"      (custom claim)
-      iss    — "akademik"
-      aud    — "akademik"
-      exp    — expiration timestamp
-    """
     try:
         payload = jwt.decode(
             token,
@@ -40,8 +28,9 @@ def decode_token(token: str) -> TokenPayload:
     if sub is None:
         raise InvalidTokenError("Missing subject claim")
 
-    # ClaimTypes.Role in .NET can be deserialized as a list by PyJWT
-    role_claim = payload.get("role", "")
+    ROLE_CLAIM = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
+
+    role_claim = payload.get("role") or payload.get(ROLE_CLAIM) or ""
     role = role_claim[0] if isinstance(role_claim, list) else role_claim
 
     try:

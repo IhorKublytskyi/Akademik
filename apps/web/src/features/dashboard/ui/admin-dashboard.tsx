@@ -21,6 +21,7 @@ export default function AdminDashboard() {
         queryFn: () => getAssignmentsList(1, 1)
     })
 
+    console.log(usersData)
     return (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mt-6">
             <Card>
@@ -30,7 +31,7 @@ export default function AdminDashboard() {
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">
-                        {loadingUsers ? "..." : usersData?.totalCount || 0}
+                        {loadingUsers ? "..." : usersData?.count || 0}
                     </div>
                     <p className="text-xs text-muted-foreground">Registered in system</p>
                 </CardContent>
@@ -43,7 +44,7 @@ export default function AdminDashboard() {
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">
-                        {loadingRooms ? "..." : roomsData?.totalCount || 0}
+                        {loadingRooms ? "..." : roomsData?.count || 0}
                     </div>
                     <p className="text-xs text-muted-foreground">Physical rooms</p>
                 </CardContent>
