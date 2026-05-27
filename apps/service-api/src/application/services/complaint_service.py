@@ -36,8 +36,8 @@ async def create_complaint(
         try:
             await notifier.notify(
                 user_id=user_id,
-                title="Жалоба зарегистрирована",
-                content="Ваша жалоба принята и будет рассмотрена.",
+                title="Complaint registered",
+                content="Complaint on review.",
             )
         except Exception:
             pass  # notification failure must not block complaint creation
@@ -86,12 +86,12 @@ async def update_complaint_status(
     await db.commit()
     await db.refresh(complaint)
 
-    if complaint.user_id is not None:
+    if complaint.user_id is not None and not complaint.is_anonymous:
         try:
             await notifier.notify(
                 user_id=complaint.user_id,
-                title="Статус жалобы изменён",
-                content=f"Статус вашей жалобы изменён: {old_status} → {data.status}.",
+                title="Status Changed",
+                content=f"Status Changed: {old_status} → {data.status}.",
             )
         except Exception:
             pass  # notification failure must not block status update
