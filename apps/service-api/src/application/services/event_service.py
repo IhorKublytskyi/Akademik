@@ -109,18 +109,19 @@ async def create_room_inspections(
         db.add(event)
         events.append(event)
 
-    await db.flush()
-
-    for uid in data.user_ids:
-        await notifier.notify(
-            user_id=uid,
-            title="Запланирован контроль комнаты",
-            content=f"{data.title} — {data.start_at.strftime('%d.%m.%Y %H:%M')}",
-        )
-
     await db.commit()
 
     for event in events:
         await db.refresh(event)
+
+    for uid in data.user_ids:
+        try:
+            await notifier.notify(
+                user_id=uid,
+                title="Запланирован контроль комнаты",
+                content=f"{data.title} — {data.start_at.strftime('%d.%m.%Y %H:%M')}",
+            )
+        except Exception:
+            pass  # notification failure must not block inspection creation
 
     return events
