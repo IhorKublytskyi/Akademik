@@ -22,7 +22,7 @@ async def create_complaint(
     notifier: NotificationPort,
 ) -> ComplaintModel:
     complaint = ComplaintModel(
-        user_id=None if data.is_anonymous else user_id,
+        user_id=user_id,
         room_id=data.room_id,
         content=data.content,
         is_anonymous=data.is_anonymous,
