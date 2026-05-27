@@ -31,7 +31,6 @@ export default function AssignStudentDialog() {
     const [open, setOpen] = useState(false)
     const currentUser = useAuthStore((state) => state.user)
 
-
     const queryClient = useQueryClient()
 
     const { data: usersData, isLoading: isLoadingUsers } = useQuery({
@@ -47,6 +46,8 @@ export default function AssignStudentDialog() {
         queryFn: () => getRoomsList(1, 100),
         enabled: open
     })
+
+    console.log(usersData, roomsData)
 
     const { control, handleSubmit, reset, formState: { errors } } = useForm<AssignFormValues>({
         resolver: zodResolver(assignSchema),

@@ -36,9 +36,6 @@ export interface Roommate {
 }
 
 export interface RoommatesResponse {
-    roomNumber: number
-    roommates: {
-        $id: string
-        $values: Roommate[]
-    }
+    roomNumber: string
+    roommates: Roommate[]
 }

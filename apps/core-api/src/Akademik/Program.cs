@@ -1,25 +1,5 @@
 using System.Security.Claims;
 using System.Text;
-<<<<<<< Updated upstream
-=======
-using Akademik.DataProvider.Models;
-using Akademik.Models;
-using Akademik.Services.Users;
-using Akademik.DataProvider;
-using Akademik.Services.Assignments;
-using Akademik.Services.Rooms;
-using Akademik.Middleware;
-using Akademik.Validators;
-using Akademik.DataProvider.Repositories;
-using Akademik.Services.Security;
-using Akademik.Services.Auth;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using FluentValidation;
-using System.Text.Json;
->>>>>>> Stashed changes
 using System.Text.Json.Serialization;
 using Akademik.DataProvider;
 using Akademik.DataProvider.Models;
@@ -144,23 +124,27 @@ WebApplication app = builder.Build();
 
 using (IServiceScope scope = app.Services.CreateScope())
 {
-    var services = scope.ServiceProvider;
-    try
-    {
-        var context = services.GetRequiredService<AkademikDbContext>();
+	IServiceProvider services = scope.ServiceProvider;
 
-        await context.Database.MigrateAsync();
+	try
+	{
+		AkademikDbContext context = services.GetRequiredService<AkademikDbContext>();
 
-        if (app.Environment.IsDevelopment())
-        {
-            await DbInitializer.InitializeAsync(context);
-        }
-    }
-    catch (Exception ex)
-    {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while migrating or initializing the database.");
-    }
+		if(context.Database.IsRelational())
+		{
+			await context.Database.MigrateAsync();
+		}
+
+		if (app.Environment.IsDevelopment())
+		{
+			await DbInitializer.InitializeAsync(context);
+		}
+	}
+	catch (Exception ex)
+	{
+		ILogger<Program> logger = services.GetRequiredService<ILogger<Program>>();
+		logger.LogError(ex, "An error occurred while migrating or initializing the database.");
+	}
 }
 
 if (app.Environment.IsDevelopment())
@@ -185,15 +169,21 @@ app.MapPost("/api/core/auth/login", async (
 	IAuthService authService,
 	CancellationToken cancellationToken) =>
 {
-    try
-    {
-        var (user, tokens) = await authService.LoginAsync(request.Email, request.Password, cancellationToken);
-        return Results.Ok(new LoginResponse { User = UserModel.FromUser(user), Token = tokens });
-    }
-    catch (UnauthorizedAccessException)
-    {
-        return Results.BadRequest("Invalid email or password");
-    }
+	try
+	{
+		(User user, TokenModel tokens) =
+			await authService.LoginAsync(request.Email, request.Password, cancellationToken);
+
+		return Results.Ok(new LoginResponse
+		{
+			User = UserModel.FromUser(user),
+			Token = tokens
+		});
+	}
+	catch (UnauthorizedAccessException)
+	{
+		return Results.BadRequest("Invalid email or password");
+	}
 });
 
 app.MapPost("/api/core/auth/register", async (
@@ -204,23 +194,30 @@ app.MapPost("/api/core/auth/register", async (
 {
 	ValidationResult? validationResult = await validator.ValidateAsync(request, cancellationToken);
 
-    try
-    {
-        User newUser = new()
-        {
-            Email = request.Email,
-            FirstName = request.FirstName,
-            LastName = request.LastName,
-            Role = Enum.Parse<UserRole>(request.Role),
-            PhoneNumber = request.PhoneNumber,
-        };
-        var registeredUser = await authService.RegisterAsync(newUser, request.Password, cancellationToken);
-        return Results.Ok(UserModel.FromUser(registeredUser));
-    }
-    catch (InvalidOperationException ex)
-    {
-        return Results.BadRequest(ex.Message);
-    }
+	if (!validationResult.IsValid)
+	{
+		return Results.ValidationProblem(validationResult.ToDictionary());
+	}
+
+	try
+	{
+		User newUser = new()
+		{
+			Email = request.Email,
+			FirstName = request.FirstName,
+			LastName = request.LastName,
+			Role = Enum.Parse<UserRole>(request.Role),
+			PhoneNumber = request.PhoneNumber
+		};
+
+		User registeredUser = await authService.RegisterAsync(newUser, request.Password, cancellationToken);
+
+		return Results.Ok(UserModel.FromUser(registeredUser));
+	}
+	catch (InvalidOperationException ex)
+	{
+		return Results.BadRequest(ex.Message);
+	}
 }).RequireAuthorization("AdminOnly");
 
 app.MapPost("/api/core/auth/refresh", async (
@@ -343,10 +340,10 @@ app.MapDelete("/api/core/assignments/{id:int}", async (
 	IAssignmentService service,
 	CancellationToken cancellationToken) =>
 {
-    if (id <= 0)
-    {
-        return Results.BadRequest("Invalid id.");
-    }
+	if (id <= 0)
+	{
+		return Results.BadRequest("Invalid id.");
+	}
 
 	await service.DeleteAsync(id, cancellationToken);
 
@@ -434,14 +431,14 @@ app.MapPost("/api/core/users-edit", async (
 }).RequireAuthorization("AdminOnly");
 
 app.MapDelete("/api/core/users/{id:int}", async (
-    [FromRoute] int id,
-    IUserService service,
-    CancellationToken cancellationToken) =>
+	[FromRoute] int id,
+	IUserService service,
+	CancellationToken cancellationToken) =>
 {
-    if (id <= 0)
-    {
-        return Results.BadRequest("Invalid id.");
-    }
+	if (id <= 0)
+	{
+		return Results.BadRequest("Invalid id.");
+	}
 
 	await service.DeleteAsync(id, cancellationToken);
 
