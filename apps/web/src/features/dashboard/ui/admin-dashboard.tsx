@@ -33,8 +33,6 @@ export default function AdminDashboard() {
         queryFn: () => getComplaintsList()
     })
 
-    console.log(assignmentsData)
-
     return (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mt-6">
             <Card>
@@ -70,7 +68,7 @@ export default function AdminDashboard() {
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">
-                        {loadingAssignments ? "..." : assignmentsData?.length || 0}
+                        {loadingAssignments ? "..." : assignmentsData?.count || 0}
                     </div>
                     <p className="text-xs text-muted-foreground">Total move-ins</p>
                 </CardContent>
