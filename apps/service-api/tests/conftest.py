@@ -61,7 +61,14 @@ class StubNotifier(NotificationPort):
         content: str,
         channel: NotificationChannel = NotificationChannel.APP,
     ) -> None:
-        self.calls.append({"user_id": user_id, "title": title, "content": content})
+        self.calls.append(
+            {
+                "user_id": user_id,
+                "title": title,
+                "content": content,
+                "channel": channel,
+            }
+        )
 
 
 @pytest.fixture

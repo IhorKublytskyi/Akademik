@@ -9,7 +9,7 @@ from src.application.exceptions.exceptions import (
 )
 from src.application.ports.notification_port import NotificationPort
 from src.domain.entities.issue import IssueCreate, IssueStatusUpdate
-from src.domain.enums import IssueStatus
+from src.domain.enums import IssueStatus, NotificationChannel
 from src.infrastructure.database.models.issue import IssueModel
 from src.infrastructure.utils.datetime_utils import utc_now_naive
 
@@ -96,6 +96,14 @@ async def update_issue_status(
             title="Статус заявки изменён",
             content=f'Статус вашей заявки "{issue.title}" изменён: {old_status} → {data.status}.',
         )
+
+        if data.status == IssueStatus.CLOSED:
+            await notifier.notify(
+                user_id=issue.user_id,
+                title="Заявка закрыта",
+                content=f'Ваша заявка "{issue.title}" закрыта.',
+                channel=NotificationChannel.EMAIL,
+            )
     except Exception:
         # notification failure must not block status update
         logger.warning("Notification failed", exc_info=True)
