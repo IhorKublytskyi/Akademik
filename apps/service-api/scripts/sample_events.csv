@@ -1,0 +1,6 @@
+user_id,title,description,start_at,end_at,type
+1,Przegląd pokoju 101,Kwartalna inspekcja techniczna,2026-12-01T09:00:00,2026-12-01T10:00:00,ROOM_INSPECTION
+1,Termin płatności grudzień,Czynsz za grudzień 2026,2026-12-10T00:00:00,2026-12-10T23:59:00,PAYMENT
+2,Przegląd pokoju 102,Kwartalna inspekcja techniczna,2026-12-01T10:00:00,2026-12-01T11:00:00,ROOM_INSPECTION
+2,Zebranie mieszkańców,Spotkanie informacyjne w świetlicy,2026-12-05T18:00:00,2026-12-05T19:30:00,OTHER
+3,Termin płatności grudzień,Czynsz za grudzień 2026,2026-12-10T00:00:00,2026-12-10T23:59:00,PAYMENT

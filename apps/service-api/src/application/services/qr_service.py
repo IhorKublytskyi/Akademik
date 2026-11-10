@@ -1,6 +1,6 @@
 import secrets
 
-from sqlalchemy import func, select
+from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.exceptions.exceptions import (
@@ -109,3 +109,13 @@ async def revoke_qr_code(
     await db.commit()
     await db.refresh(qr)
     return qr
+
+
+async def revoke_user_qr_codes(db: AsyncSession, user_id: int) -> int:
+    result = await db.execute(
+        update(QRCodeModel)
+        .where(QRCodeModel.user_id == user_id, QRCodeModel.status == QRStatus.ACTIVE)
+        .values(status=QRStatus.REVOKED)
+    )
+    await db.commit()
+    return result.rowcount

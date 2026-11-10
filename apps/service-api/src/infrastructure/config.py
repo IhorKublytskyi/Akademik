@@ -19,5 +19,11 @@ class Settings(BaseSettings):
     jwt_issuer: str = os.getenv("JWT_ISSUER", "akademik")
     jwt_audience: str = os.getenv("JWT_AUDIENCE", "akademik")
 
+    internal_api_key: str = os.getenv("INTERNAL_API_KEY", "dev-internal-key")
+    core_api_url: str = os.getenv("CORE_API_URL", "http://core-api:8080")
+    smtp_host: str = os.getenv("SMTP_HOST", "mailpit")
+    smtp_port: int = int(os.getenv("SMTP_PORT", "1025"))
+    smtp_from: str = os.getenv("SMTP_FROM", "noreply@akademik.local")
+
 
 settings = Settings()

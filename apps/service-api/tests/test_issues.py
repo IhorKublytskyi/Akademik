@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.application.exceptions.exceptions import IssueAlreadyClosed, IssueNotFound
 from src.application.services.issue_service import create_issue, update_issue_status
 from src.domain.entities.issue import IssueCreate, IssueStatusUpdate
-from src.domain.enums import IssuePriority, IssueStatus
+from src.domain.enums import IssuePriority, IssueStatus, NotificationChannel
 from src.infrastructure.database.models.issue import IssueModel
 from tests.conftest import StubNotifier
 
@@ -91,3 +91,16 @@ async def test_update_issue_notifies_owner(db: AsyncSession, notifier: StubNotif
 
     assert len(notifier.calls) == 1
     assert notifier.calls[0]["user_id"] == 15
+
+
+@pytest.mark.asyncio
+async def test_close_issue_also_notifies_by_email(db: AsyncSession, notifier: StubNotifier):
+    issue = await _make_issue(db, notifier, user_id=16)
+    notifier.calls.clear()
+
+    await update_issue_status(db, issue.id, IssueStatusUpdate(status=IssueStatus.CLOSED), notifier)
+
+    channels = [call["channel"] for call in notifier.calls]
+
+    assert channels == [NotificationChannel.APP, NotificationChannel.EMAIL]
+    assert all(call["user_id"] == 16 for call in notifier.calls)
