@@ -49,6 +49,10 @@ public sealed class AssignmentRepository : IAssignmentRepository
         };
     }
 
+    public async ValueTask<Assignment?> GetByIdAsync(int id, CancellationToken cancellationToken){
+        return await _dbContext.Assignments.FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
+    }
+
     public async ValueTask<int> GetActiveAssignmentsCountByRoomIdAsync(int roomId, CancellationToken cancellationToken)
     {
         return await _dbContext.Assignments

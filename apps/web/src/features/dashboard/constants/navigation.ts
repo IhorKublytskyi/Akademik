@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, DoorOpen, ClipboardList, QrCode, MessageSquare, UserCheck, CalendarDays } from "lucide-react"
+import { LayoutDashboard, Users, DoorOpen, ClipboardList, QrCode, MessageSquare, UserCheck, CalendarDays, Bell } from "lucide-react"
 
 export const NAV_ITEMS = [
     { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard, roles: ["Admin", "Resident"] },
@@ -9,4 +9,5 @@ export const NAV_ITEMS = [
     { title: "Assignments", href: "/dashboard/assignments", icon: UserCheck, roles: ["Admin"] },
     { title: "My QR", href: "/dashboard/qr", icon: QrCode, roles: ["Resident"] },
     { title: "Events", href: "/dashboard/events", icon: CalendarDays, roles: ["Admin", "Resident"] },
+    { title: "Notifications", href: "/dashboard/notifications", icon: Bell, roles: ["Admin", "Resident"] },
 ]

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, model_validator
 
 from src.domain.enums import ComplaintStatus
 
@@ -14,7 +14,7 @@ class UserNestedResponse(BaseModel):
         from_attributes = True
 
 class ComplaintCreate(BaseModel):
-    room_id: int | None = None
+    room_id: int | None = Field(None, ge=1, le=2_147_483_647)
     content: str
     is_anonymous: bool = False
 
@@ -32,6 +32,13 @@ class ComplaintResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+    @model_validator(mode="after")
+    def mask_anonymous(self) -> "ComplaintResponse":
+        if self.is_anonymous:
+            self.user_id = None
+            self.user = None
+        return self
 
 
 class ComplaintStatusUpdate(BaseModel):
