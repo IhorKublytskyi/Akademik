@@ -49,7 +49,7 @@ export default function ResidentDashboard() {
                                 </div>
                             ) : (
                                 <p className="text-sm text-muted-foreground italic pt-2 text-center">
-                                    You don't have any roommates assigned to this room yet.
+                                    You don&apos;t have any roommates assigned to this room yet.
                                 </p>
                             )}
                         </div>

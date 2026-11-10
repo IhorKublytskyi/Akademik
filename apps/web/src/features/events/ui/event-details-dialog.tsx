@@ -54,7 +54,6 @@ export default function EventDetailsDialog({ open, onOpenChange, selectedEvent, 
                 endAt: format(new Date(selectedEvent.end_at + "Z"), "yyyy-MM-dd'T'HH:mm")
             })
         } else if (selectedSlot) {
-            // eslint-disable-next-line react-hooks/set-state-in-effect
             setFormData({
                 title: "", description: "",
                 startAt: format(selectedSlot.start, "yyyy-MM-dd'T'HH:mm"),
