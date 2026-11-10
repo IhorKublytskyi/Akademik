@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json.Serialization;
 using Akademik.DataProvider;
@@ -8,6 +9,7 @@ using Akademik.Middleware;
 using Akademik.Models;
 using Akademik.Services.Assignments;
 using Akademik.Services.Auth;
+using Akademik.Services.Integration;
 using Akademik.Services.JwtAuthorization;
 using Akademik.Services.Models;
 using Akademik.Services.Rooms;
@@ -49,6 +51,17 @@ builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IRoomRepository, RoomRepository>();
 builder.Services.AddScoped<IAssignmentService, AssignmentService>();
 builder.Services.AddScoped<IAssignmentRepository, AssignmentRepository>();
+
+// Integration with service-api: typed client + standard resilience handler
+// (retry with exponential backoff, circuit breaker, timeouts).
+builder.Services
+	.AddHttpClient<IServiceApiClient, ServiceApiClient>(client =>
+	{
+		string baseUrl = builder.Configuration["Integration:ServiceApiUrl"] ?? "http://service-api:3002";
+		client.BaseAddress = new Uri(baseUrl.TrimEnd('/') + "/api/service/");
+		client.DefaultRequestHeaders.Add("X-Api-Key", builder.Configuration["Integration:ApiKey"] ?? string.Empty);
+	})
+	.AddStandardResilienceHandler();
 
 builder.Services.AddEndpointsApiExplorer();
 
@@ -434,6 +447,8 @@ app.MapPost("/api/core/users-edit", async (
 app.MapDelete("/api/core/users/{id:int}", async (
 	[FromRoute] int id,
 	IUserService service,
+	IServiceApiClient serviceApiClient,
+	ILogger<Program> logger,
 	CancellationToken cancellationToken) =>
 {
 	if (id <= 0)
@@ -442,6 +457,16 @@ app.MapDelete("/api/core/users/{id:int}", async (
 	}
 
 	await service.DeleteAsync(id, cancellationToken);
+
+	// The user is already deleted; a failure in service-api must not fail this request.
+	try
+	{
+		await serviceApiClient.NotifyUserDeletedAsync(id, cancellationToken);
+	}
+	catch (Exception ex)
+	{
+		logger.LogWarning(ex, "Integration: failed to notify service-api about deleted user {UserId}", id);
+	}
 
 	return Results.Ok();
 }).RequireAuthorization("AdminOnly");
@@ -491,7 +516,55 @@ app.MapGet("/api/core/users-get/{id:int}", async (int id,
 	return Results.Ok(UserModel.FromUser(user));
 }).RequireAuthorization("AdminOnly");
 
+app.MapGet("/api/core/internal/users/{id:int}", async (
+	int id,
+	HttpContext context,
+	IConfiguration configuration,
+	IUserService service,
+	ILogger<Program> logger,
+	CancellationToken cancellationToken) =>
+{
+	string expectedKey = configuration["Integration:ApiKey"] ?? string.Empty;
+	string providedKey = context.Request.Headers["X-Api-Key"].ToString();
+
+	if (!IsValidApiKey(expectedKey, providedKey))
+	{
+		logger.LogWarning("Integration: rejected internal request for user {UserId} (missing or invalid API key)", id);
+		return Results.Unauthorized();
+	}
+
+	User? user = await service.GetByIdAsync(id, cancellationToken);
+
+	if (user is null)
+	{
+		logger.LogInformation("Integration: internal lookup for unknown user {UserId}", id);
+		return Results.NotFound();
+	}
+
+	logger.LogInformation("Integration: internal lookup for user {UserId}", id);
+
+	return Results.Ok(new
+	{
+		user.Id,
+		user.Email,
+		user.FirstName,
+		user.LastName
+	});
+});
+
 app.Run();
+
+static bool IsValidApiKey(string expectedKey, string providedKey)
+{
+	if (string.IsNullOrEmpty(expectedKey) || string.IsNullOrEmpty(providedKey))
+	{
+		return false;
+	}
+
+	return CryptographicOperations.FixedTimeEquals(
+		Encoding.UTF8.GetBytes(expectedKey),
+		Encoding.UTF8.GetBytes(providedKey));
+}
 
 public partial class Program
 {
