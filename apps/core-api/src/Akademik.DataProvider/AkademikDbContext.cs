@@ -29,7 +29,13 @@ public class DbConextDesignTimeFactory : IDesignTimeDbContextFactory<AkademikDbC
     {
         var optionsBuilder = new DbContextOptionsBuilder<AkademikDbContext>();
 
-        optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=Akademik;Username=postgres;Password=arma03042003");
+        // Used by `dotnet ef`. `migrations add` needs no connection; `database update` needs the
+        // real one, passed via the same variable Docker uses (no password is committed here).
+        string connectionString =
+            Environment.GetEnvironmentVariable("ConnectionStrings__AkademikConnectionString")
+            ?? "Host=localhost;Port=5432;Database=Akademik;Username=postgres";
+
+        optionsBuilder.UseNpgsql(connectionString);
 
         return new AkademikDbContext(optionsBuilder.Options);
     }

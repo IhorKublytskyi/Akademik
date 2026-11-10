@@ -1,13 +1,16 @@
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json.Serialization;
 using Akademik.DataProvider;
 using Akademik.DataProvider.Models;
 using Akademik.DataProvider.Repositories;
+using Akademik.Integration;
 using Akademik.Middleware;
 using Akademik.Models;
 using Akademik.Services.Assignments;
 using Akademik.Services.Auth;
+using Akademik.Services.Integration;
 using Akademik.Services.JwtAuthorization;
 using Akademik.Services.Models;
 using Akademik.Services.Rooms;
@@ -23,6 +26,15 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+// Secrets come from environment variables (Docker: Jwt__Key=${JWT_SECRET}) or dotnet user-secrets, never from appsettings.json.
+string jwtKey = builder.Configuration["Jwt:Key"] ?? string.Empty;
+if (Encoding.UTF8.GetByteCount(jwtKey) < 32)
+{
+	throw new InvalidOperationException(
+		"Jwt:Key is not configured or shorter than 32 bytes. Set JWT_SECRET in .env (Docker) " +
+		"or run: dotnet user-secrets set \"Jwt:Key\" \"<key>\" --project Akademik");
+}
 
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateAssignmentRequestValidator>();
@@ -49,6 +61,9 @@ builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IRoomRepository, RoomRepository>();
 builder.Services.AddScoped<IAssignmentService, AssignmentService>();
 builder.Services.AddScoped<IAssignmentRepository, AssignmentRepository>();
+
+// Integration with service-api: typed client with bounded retries (see ServiceApiClientRegistration).
+builder.Services.AddServiceApiClient(builder.Configuration);
 
 builder.Services.AddEndpointsApiExplorer();
 
@@ -110,7 +125,7 @@ builder.Services
 			ValidateIssuerSigningKey = true,
 			ValidIssuer = builder.Configuration["Jwt:Issuer"],
 			ValidAudience = builder.Configuration["Jwt:Audience"],
-			IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+			IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
 		};
 	});
 
@@ -434,6 +449,8 @@ app.MapPost("/api/core/users-edit", async (
 app.MapDelete("/api/core/users/{id:int}", async (
 	[FromRoute] int id,
 	IUserService service,
+	IServiceApiClient serviceApiClient,
+	ILogger<Program> logger,
 	CancellationToken cancellationToken) =>
 {
 	if (id <= 0)
@@ -442,6 +459,16 @@ app.MapDelete("/api/core/users/{id:int}", async (
 	}
 
 	await service.DeleteAsync(id, cancellationToken);
+
+	// The user is already deleted; a failure in service-api must not fail this request.
+	try
+	{
+		await serviceApiClient.NotifyUserDeletedAsync(id, cancellationToken);
+	}
+	catch (Exception ex)
+	{
+		logger.LogWarning(ex, "Integration: failed to notify service-api about deleted user {UserId}", id);
+	}
 
 	return Results.Ok();
 }).RequireAuthorization("AdminOnly");
@@ -491,7 +518,55 @@ app.MapGet("/api/core/users-get/{id:int}", async (int id,
 	return Results.Ok(UserModel.FromUser(user));
 }).RequireAuthorization("AdminOnly");
 
+app.MapGet("/api/core/internal/users/{id:int}", async (
+	int id,
+	HttpContext context,
+	IConfiguration configuration,
+	IUserService service,
+	ILogger<Program> logger,
+	CancellationToken cancellationToken) =>
+{
+	string expectedKey = configuration["Integration:ApiKey"] ?? string.Empty;
+	string providedKey = context.Request.Headers["X-Api-Key"].ToString();
+
+	if (!IsValidApiKey(expectedKey, providedKey))
+	{
+		logger.LogWarning("Integration: rejected internal request for user {UserId} (missing or invalid API key)", id);
+		return Results.Unauthorized();
+	}
+
+	User? user = await service.GetByIdAsync(id, cancellationToken);
+
+	if (user is null)
+	{
+		logger.LogInformation("Integration: internal lookup for unknown user {UserId}", id);
+		return Results.NotFound();
+	}
+
+	logger.LogInformation("Integration: internal lookup for user {UserId}", id);
+
+	return Results.Ok(new
+	{
+		user.Id,
+		user.Email,
+		user.FirstName,
+		user.LastName
+	});
+});
+
 app.Run();
+
+static bool IsValidApiKey(string expectedKey, string providedKey)
+{
+	if (string.IsNullOrEmpty(expectedKey) || string.IsNullOrEmpty(providedKey))
+	{
+		return false;
+	}
+
+	return CryptographicOperations.FixedTimeEquals(
+		Encoding.UTF8.GetBytes(expectedKey),
+		Encoding.UTF8.GetBytes(providedKey));
+}
 
 public partial class Program
 {

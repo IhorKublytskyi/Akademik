@@ -135,7 +135,20 @@ alembic upgrade head
 
 ### core-api (lokalnie)
 
+Sekrety nie są przechowywane w `appsettings.json`. Przy uruchomieniu bez Dockera ustaw je przez `dotnet user-secrets` (z katalogu `apps/core-api/src`):
+
 ```bash
+dotnet user-secrets set "Jwt:Key" "<ta sama wartość co JWT_SECRET w .env>" --project ./Akademik
+dotnet user-secrets set "ConnectionStrings:AkademikConnectionString" "Host=localhost;Port=5432;Database=Akademik;Username=postgres;Password=<hasło>" --project ./Akademik
+dotnet user-secrets set "Integration:ApiKey" "<INTERNAL_API_KEY z .env>" --project ./Akademik
+```
+
+W Dockerze wartości pochodzą z `.env` (`JWT_SECRET`, `POSTGRES_*`, `INTERNAL_API_KEY`).
+
+`dotnet ef database update` nie czyta user-secrets — connection string podaj przez zmienną środowiskową:
+
+```bash
+export ConnectionStrings__AkademikConnectionString="Host=localhost;Port=5432;Database=Akademik;Username=postgres;Password=<hasło>"
 dotnet ef database update --project ./Akademik.DataProvider --startup-project Akademik
 dotnet run --project ./Akademik
 ```
