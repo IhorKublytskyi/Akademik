@@ -81,7 +81,7 @@ export default function AdminDashboard() {
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">
-                        {loadingIssues ? "..." : issuesData?.length || 0}
+                        {loadingIssues ? "..." : issuesData?.filter((issue) => issue.status !== "CLOSED").length ?? 0}
                     </div>
                     <p className="text-xs text-muted-foreground">Active breakdowns</p>
                 </CardContent>
@@ -94,7 +94,7 @@ export default function AdminDashboard() {
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">
-                        {loadingComplaints ? "..." : complaintsData?.length || 0}
+                        {loadingComplaints ? "..." : complaintsData?.filter((c) => c.status === "NEW" || c.status === "REVIEW").length ?? 0}
                     </div>
                     <p className="text-xs text-muted-foreground">Requires review</p>
                 </CardContent>

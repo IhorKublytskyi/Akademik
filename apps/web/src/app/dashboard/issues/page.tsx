@@ -42,7 +42,6 @@ export default function IssuesPage() {
 
     if (isLoading) return <div>Loading issues...</div>
 
-    console.log(issues)
 
     return (
         <div className="flex flex-col gap-6">

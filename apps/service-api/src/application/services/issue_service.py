@@ -1,3 +1,4 @@
+import logging
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -13,6 +14,8 @@ from src.infrastructure.database.models.issue import IssueModel
 from src.infrastructure.utils.datetime_utils import utc_now_naive
 
 _ADMIN_ROLES = {"Admin", "ADMIN"}
+
+logger = logging.getLogger(__name__)
 
 
 async def create_issue(
@@ -40,7 +43,8 @@ async def create_issue(
             content=f'Ваша заявка "{data.title}" успешно зарегистрирована.',
         )
     except Exception:
-        pass  # notification failure must not block issue creation
+        # notification failure must not block issue creation
+        logger.warning("Notification failed", exc_info=True)
 
     return issue
 
@@ -93,6 +97,7 @@ async def update_issue_status(
             content=f'Статус вашей заявки "{issue.title}" изменён: {old_status} → {data.status}.',
         )
     except Exception:
-        pass  # notification failure must not block status update
+        # notification failure must not block status update
+        logger.warning("Notification failed", exc_info=True)
 
     return issue

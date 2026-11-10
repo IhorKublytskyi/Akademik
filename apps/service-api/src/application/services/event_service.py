@@ -1,3 +1,5 @@
+import logging
+
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -8,6 +10,8 @@ from src.domain.enums import EventSource, EventType
 from src.infrastructure.database.models.event import EventModel
 
 _ADMIN_ROLES = {"Admin", "ADMIN"}
+
+logger = logging.getLogger(__name__)
 
 async def get_user_events(
     db: AsyncSession,
@@ -122,6 +126,7 @@ async def create_room_inspections(
                 content=f"{data.title} — {data.start_at.strftime('%d.%m.%Y %H:%M')}",
             )
         except Exception:
-            pass  # notification failure must not block inspection creation
+            # notification failure must not block inspection creation
+            logger.warning("Notification failed", exc_info=True)
 
     return events

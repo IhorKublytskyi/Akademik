@@ -1,3 +1,4 @@
+import logging
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -13,6 +14,8 @@ from src.infrastructure.database.models.complaint import ComplaintModel
 from src.infrastructure.utils.datetime_utils import utc_now_naive
 
 _ADMIN_ROLES = {"Admin", "ADMIN"}
+
+logger = logging.getLogger(__name__)
 
 
 async def create_complaint(
@@ -40,7 +43,8 @@ async def create_complaint(
                 content="Complaint on review.",
             )
         except Exception:
-            pass  # notification failure must not block complaint creation
+            # notification failure must not block complaint creation
+            logger.warning("Notification failed", exc_info=True)
 
     return complaint
 
@@ -94,6 +98,7 @@ async def update_complaint_status(
                 content=f"Status Changed: {old_status} → {data.status}.",
             )
         except Exception:
-            pass  # notification failure must not block status update
+            # notification failure must not block status update
+            logger.warning("Notification failed", exc_info=True)
 
     return complaint

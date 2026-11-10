@@ -4,7 +4,7 @@ import { Assignment, CreateAssignmentRequest, PagedResult, RoommatesResponse } f
 export const getAssignmentsList = async (pageNumber = 1, pageSize = 10): Promise<PagedResult<Assignment>> => {
     const response = await api.post<PagedResult<Assignment>>("/api/core/assignments-get", {
         pagination: {
-            pageNumber,
+            page: pageNumber,
             pageSize
         }
     })

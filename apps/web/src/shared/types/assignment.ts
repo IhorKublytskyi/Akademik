@@ -2,7 +2,7 @@ import { Room } from "./room"
 import { User } from "./user"
 
 export interface PaginationParams {
-    pageNumber: number;
+    page: number
     pageSize: number;
 }
 

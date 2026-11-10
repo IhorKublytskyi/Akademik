@@ -30,7 +30,6 @@ export default function RoomsPage() {
     const rooms = data?.items || []
     const totalPages = Math.ceil((data?.count || 0) / pageSize)
 
-    console.log(rooms)
 
     return (
         <RoleGuard allowedRoles={["Admin"]}>
