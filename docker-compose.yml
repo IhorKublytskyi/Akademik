@@ -39,6 +39,7 @@ services:
     environment:
       - ConnectionStrings__AkademikConnectionString=Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
       - ASPNETCORE_ENVIRONMENT=Development
+      - Jwt__Key=${JWT_SECRET}
       - Integration__ApiKey=${INTERNAL_API_KEY}
       - Integration__ServiceApiUrl=http://service-api:3002
     depends_on:

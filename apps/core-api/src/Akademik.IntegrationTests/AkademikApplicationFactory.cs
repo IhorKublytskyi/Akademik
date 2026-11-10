@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Configuration;
 
 namespace Akademik.IntegrationTests;
 
@@ -15,23 +14,23 @@ public class AkademikApplicationFactory : WebApplicationFactory<Program>
 
     public FakeServiceApiClient ServiceApiClient { get; } = new();
 
+    // One database per factory: test classes run in parallel and each factory
+    // deletes and reseeds its database on startup.
+    private readonly string _databaseName = $"IntegrationTestDb-{Guid.NewGuid()}";
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         // Force testing environment
         builder.UseEnvironment("Development");
 
-        builder.ConfigureAppConfiguration((context, config) =>
-        {
-            config.AddInMemoryCollection(new Dictionary<string, string?>
-            {
-                { "Jwt:Key", "SuperSecretKeyForIntegrationTesting1234567890" }, // Longer key
-                { "Jwt:Issuer", "AkademikCore" },
-                { "Jwt:Audience", "AkademikApp" },
-                { "ConnectionStrings:AkademikConnectionString", "Host=localhost;Database=testing" }, // Dummy
-                { "Integration:ApiKey", TestApiKey },
-                { "Integration:ServiceApiUrl", "http://service-api.test" }
-            });
-        });
+        // UseSetting (not ConfigureAppConfiguration) so Program.cs sees these values
+        // before builder.Build(), e.g. the Jwt:Key startup check.
+        builder.UseSetting("Jwt:Key", "SuperSecretKeyForIntegrationTesting1234567890");
+        builder.UseSetting("Jwt:Issuer", "AkademikCore");
+        builder.UseSetting("Jwt:Audience", "AkademikApp");
+        builder.UseSetting("ConnectionStrings:AkademikConnectionString", "Host=localhost;Database=testing"); // Dummy
+        builder.UseSetting("Integration:ApiKey", TestApiKey);
+        builder.UseSetting("Integration:ServiceApiUrl", "http://service-api.test");
 
         builder.ConfigureServices(services =>
         {
@@ -51,7 +50,7 @@ public class AkademikApplicationFactory : WebApplicationFactory<Program>
 
             services.AddDbContext<AkademikDbContext>(options =>
             {
-                options.UseInMemoryDatabase("IntegrationTestDb");
+                options.UseInMemoryDatabase(_databaseName);
             });
 
             var sp = services.BuildServiceProvider();

@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 using Akademik.DataProvider;
 using Akademik.DataProvider.Models;
 using Akademik.DataProvider.Repositories;
+using Akademik.Integration;
 using Akademik.Middleware;
 using Akademik.Models;
 using Akademik.Services.Assignments;
@@ -25,6 +26,15 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+// Secrets come from environment variables (Docker: Jwt__Key=${JWT_SECRET}) or dotnet user-secrets, never from appsettings.json.
+string jwtKey = builder.Configuration["Jwt:Key"] ?? string.Empty;
+if (Encoding.UTF8.GetByteCount(jwtKey) < 32)
+{
+	throw new InvalidOperationException(
+		"Jwt:Key is not configured or shorter than 32 bytes. Set JWT_SECRET in .env (Docker) " +
+		"or run: dotnet user-secrets set \"Jwt:Key\" \"<key>\" --project Akademik");
+}
 
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateAssignmentRequestValidator>();
@@ -52,16 +62,8 @@ builder.Services.AddScoped<IRoomRepository, RoomRepository>();
 builder.Services.AddScoped<IAssignmentService, AssignmentService>();
 builder.Services.AddScoped<IAssignmentRepository, AssignmentRepository>();
 
-// Integration with service-api: typed client + standard resilience handler
-// (retry with exponential backoff, circuit breaker, timeouts).
-builder.Services
-	.AddHttpClient<IServiceApiClient, ServiceApiClient>(client =>
-	{
-		string baseUrl = builder.Configuration["Integration:ServiceApiUrl"] ?? "http://service-api:3002";
-		client.BaseAddress = new Uri(baseUrl.TrimEnd('/') + "/api/service/");
-		client.DefaultRequestHeaders.Add("X-Api-Key", builder.Configuration["Integration:ApiKey"] ?? string.Empty);
-	})
-	.AddStandardResilienceHandler();
+// Integration with service-api: typed client with bounded retries (see ServiceApiClientRegistration).
+builder.Services.AddServiceApiClient(builder.Configuration);
 
 builder.Services.AddEndpointsApiExplorer();
 
@@ -123,7 +125,7 @@ builder.Services
 			ValidateIssuerSigningKey = true,
 			ValidIssuer = builder.Configuration["Jwt:Issuer"],
 			ValidAudience = builder.Configuration["Jwt:Audience"],
-			IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+			IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
 		};
 	});
 
