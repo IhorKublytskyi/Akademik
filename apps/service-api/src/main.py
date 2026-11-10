@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -9,6 +11,8 @@ from src.presentation.api.v1.internal_router import router as internal_router
 from src.presentation.api.v1.issues_router import router as issues_router
 from src.presentation.api.v1.notifications_router import router as notifications_router
 from src.presentation.api.v1.qr_router import router as qr_router
+
+logging.basicConfig(level=logging.INFO)
 
 app = FastAPI(title="Service API")
 
