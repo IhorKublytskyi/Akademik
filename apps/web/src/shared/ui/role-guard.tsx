@@ -11,14 +11,14 @@ interface RoleGuardProps {
 
 export default function RoleGuard({ children, allowedRoles }: RoleGuardProps) {
     const router = useRouter()
-    const { user, isAuthenticated } = useAuthStore()
+    const user = useAuthStore((state) => state.user)
     const isAuthorized = user && allowedRoles.includes(user.role)
 
     useEffect(() => {
         if (!isAuthorized) {
             router.push("/dashboard")
         }
-    }, [user, isAuthenticated, router])
+    }, [isAuthorized, router])
 
     if (!isAuthorized) {
         return (

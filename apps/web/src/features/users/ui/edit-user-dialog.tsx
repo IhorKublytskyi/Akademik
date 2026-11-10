@@ -105,7 +105,7 @@ export default function EditUserDialog({ user, isOpen, onClose }: EditUserDialog
                             value={formData.status}
                             onValueChange={(val) => setFormData({ ...formData, status: val })}
                         >
-                            <SelectTrigger>
+                            <SelectTrigger className="w-full">
                                 <SelectValue placeholder="Select status" />
                             </SelectTrigger>
                             <SelectContent>

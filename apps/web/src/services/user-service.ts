@@ -2,14 +2,14 @@ import { api } from "@/shared/api/api-client"
 import { UpdateUserRequest, UsersListResponse } from "@/shared/types/user"
 
 export interface PaginationParams {
-    pageNumber: number
+    page: number
     pageSize: number
 }
 
 export const getUsersList = async (pageNumber = 1, pageSize = 10): Promise<UsersListResponse> => {
     const response = await api.post("/api/core/users-get", {
         pagination: {
-            pageNumber,
+            page: pageNumber,
             pageSize
         }
     })

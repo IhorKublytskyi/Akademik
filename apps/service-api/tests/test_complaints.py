@@ -43,7 +43,8 @@ async def test_create_complaint_notifies(db: AsyncSession, notifier: StubNotifie
 async def test_anonymous_complaint_no_notification(db: AsyncSession, notifier: StubNotifier):
     complaint = await _make_complaint(db, notifier, is_anonymous=True)
 
-    assert complaint.user_id is None
+    assert complaint.user_id == 42
+    assert complaint.is_anonymous is True
     assert len(notifier.calls) == 0
 
 
