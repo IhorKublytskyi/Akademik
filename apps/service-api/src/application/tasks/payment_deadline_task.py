@@ -13,7 +13,7 @@ from src.infrastructure.utils.datetime_utils import utc_now_naive
 
 logger = logging.getLogger(__name__)
 
-_NOTIFICATION_TITLE = "Напоминание об оплате"
+_NOTIFICATION_TITLE = "Payment reminder"
 _DAYS_AHEAD = 7
 
 
@@ -57,7 +57,7 @@ async def _run() -> None:
                     channel=NotificationChannel.APP,
                     title=_NOTIFICATION_TITLE,
                     content=(
-                        f'Срок оплаты "{event.title}" наступает через {_DAYS_AHEAD} дней'
+                        f'Payment deadline "{event.title}" is in {_DAYS_AHEAD} days'
                         f' — {event.start_at.strftime("%d.%m.%Y")}.'
                     ),
                     status=NotificationStatus.PENDING,

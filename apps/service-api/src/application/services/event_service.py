@@ -122,7 +122,7 @@ async def create_room_inspections(
         try:
             await notifier.notify(
                 user_id=uid,
-                title="Запланирован контроль комнаты",
+                title="Room inspection scheduled",
                 content=f"{data.title} — {data.start_at.strftime('%d.%m.%Y %H:%M')}",
             )
         except Exception:

@@ -77,7 +77,7 @@ async def test_payment_deadline_creates_notification(db: AsyncSession):
     notification = result.scalar_one_or_none()
 
     assert notification is not None
-    assert notification.title == "Напоминание об оплате"
+    assert notification.title == "Payment reminder"
     assert notification.status == NotificationStatus.PENDING
 
 

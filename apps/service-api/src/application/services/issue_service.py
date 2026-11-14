@@ -39,8 +39,8 @@ async def create_issue(
     try:
         await notifier.notify(
             user_id=user_id,
-            title="Заявка создана",
-            content=f'Ваша заявка "{data.title}" успешно зарегистрирована.',
+            title="Issue created",
+            content=f'Your issue "{data.title}" has been registered.',
         )
     except Exception:
         # notification failure must not block issue creation
@@ -93,15 +93,15 @@ async def update_issue_status(
     try:
         await notifier.notify(
             user_id=issue.user_id,
-            title="Статус заявки изменён",
-            content=f'Статус вашей заявки "{issue.title}" изменён: {old_status} → {data.status}.',
+            title="Issue status changed",
+            content=f'The status of your issue "{issue.title}" changed: {old_status} → {data.status}.',
         )
 
         if data.status == IssueStatus.CLOSED:
             await notifier.notify(
                 user_id=issue.user_id,
-                title="Заявка закрыта",
-                content=f'Ваша заявка "{issue.title}" закрыта.',
+                title="Issue closed",
+                content=f'Your issue "{issue.title}" has been closed.',
                 channel=NotificationChannel.EMAIL,
             )
     except Exception:
