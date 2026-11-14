@@ -80,7 +80,7 @@ export default function NotificationsPage() {
                         ) : (
                             notifications.map((notification) => (
                                 <TableRow key={notification.id}>
-                                    {isAdmin && <TableCell className="font-medium">#{notification.user_id}</TableCell>}
+                                    {isAdmin && <TableCell className="font-medium">{notification.user_id === 0 ? "Admins" : `#${notification.user_id}`}</TableCell>}
                                     <TableCell className="max-w-50 truncate font-medium" title={notification.title}>
                                         {notification.title}
                                     </TableCell>

@@ -9,6 +9,7 @@ from src.application.exceptions.exceptions import (
 )
 from src.application.ports.notification_port import NotificationPort
 from src.domain.entities.complaint import ComplaintCreate, ComplaintStatusUpdate
+from src.domain.entities.notification import ADMIN_INBOX_USER_ID
 from src.domain.enums import ComplaintStatus
 from src.infrastructure.database.models.complaint import ComplaintModel
 from src.infrastructure.utils.datetime_utils import utc_now_naive
@@ -35,13 +36,20 @@ async def create_complaint(
     await db.commit()
     await db.refresh(complaint)
 
+    admin_content = (
+        f"Complaint #{complaint.id} was filed anonymously."
+        if data.is_anonymous
+        else f"Complaint #{complaint.id} was filed by user #{user_id}."
+    )
+    notifications = [(ADMIN_INBOX_USER_ID, "New complaint", admin_content)]
     if not data.is_anonymous:
+        notifications.insert(
+            0, (user_id, "Complaint registered", "Complaint on review.")
+        )
+
+    for recipient_id, title, content in notifications:
         try:
-            await notifier.notify(
-                user_id=user_id,
-                title="Complaint registered",
-                content="Complaint on review.",
-            )
+            await notifier.notify(user_id=recipient_id, title=title, content=content)
         except Exception:
             # notification failure must not block complaint creation
             logger.warning("Notification failed", exc_info=True)

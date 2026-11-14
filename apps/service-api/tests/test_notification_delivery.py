@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.services.notification_read_service import get_notifications
 from src.application.tasks.deliver_notification_task import _save
+from src.domain.entities.notification import ADMIN_INBOX_USER_ID
 from src.infrastructure.database.connection import Database
 from tests.conftest import TEST_DB_URL
 
@@ -32,3 +33,14 @@ async def test_resident_sees_own_notifications_and_admin_sees_all(db: AsyncSessi
 
     assert [n.title for n in resident] == ["For one"]
     assert {n.title for n in admin} == {"For one", "For two"}
+
+
+@pytest.mark.asyncio
+async def test_admin_inbox_visible_to_admin_but_not_to_residents(db: AsyncSession):
+    await _save(user_id=ADMIN_INBOX_USER_ID, title="New complaint", content="c", channel="APP")
+
+    admin = await get_notifications(db, user_id=99, role="Admin")
+    resident = await get_notifications(db, user_id=1, role="Resident")
+
+    assert [n.title for n in admin] == ["New complaint"]
+    assert resident == []

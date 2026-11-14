@@ -7,6 +7,7 @@ from src.application.services.complaint_service import (
     update_complaint_status,
 )
 from src.domain.entities.complaint import ComplaintCreate, ComplaintStatusUpdate
+from src.domain.entities.notification import ADMIN_INBOX_USER_ID
 from src.domain.enums import ComplaintStatus
 from src.infrastructure.database.models.complaint import ComplaintModel
 from tests.conftest import StubNotifier
@@ -35,17 +36,19 @@ async def test_create_complaint_persisted(db: AsyncSession, notifier: StubNotifi
 async def test_create_complaint_notifies(db: AsyncSession, notifier: StubNotifier):
     await _make_complaint(db, notifier, user_id=10)
 
-    assert len(notifier.calls) == 1
-    assert notifier.calls[0]["user_id"] == 10
+    assert [call["user_id"] for call in notifier.calls] == [10, ADMIN_INBOX_USER_ID]
 
 
 @pytest.mark.asyncio
-async def test_anonymous_complaint_no_notification(db: AsyncSession, notifier: StubNotifier):
-    complaint = await _make_complaint(db, notifier, is_anonymous=True)
+async def test_anonymous_complaint_notifies_only_admins_without_author(
+    db: AsyncSession, notifier: StubNotifier
+):
+    complaint = await _make_complaint(db, notifier, user_id=4242, is_anonymous=True)
 
-    assert complaint.user_id == 42
+    assert complaint.user_id == 4242
     assert complaint.is_anonymous is True
-    assert len(notifier.calls) == 0
+    assert [call["user_id"] for call in notifier.calls] == [ADMIN_INBOX_USER_ID]
+    assert "4242" not in notifier.calls[0]["content"]
 
 
 @pytest.mark.asyncio

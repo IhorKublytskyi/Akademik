@@ -4,6 +4,8 @@ from pydantic import BaseModel
 
 from src.domain.enums import NotificationChannel, NotificationStatus
 
+ADMIN_INBOX_USER_ID = 0
+
 
 class NotificationResponse(BaseModel):
     id: int
